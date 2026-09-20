@@ -1,0 +1,849 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1"
+>
+
+<meta
+  name="theme-color"
+  content="#15120f"
+>
+
+<title>
+AFTR Admin — Control Room
+</title>
+
+<link
+  rel="stylesheet"
+  href="css/style.css"
+>
+
+<style>
+
+.admin-tabs{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  border-bottom:1px solid var(--line);
+  padding-bottom:18px;
+  margin-bottom:35px;
+}
+
+.admin-tab{
+  border:1px solid var(--line);
+  background:transparent;
+  color:var(--ink);
+  padding:11px 15px;
+  font:400 8px var(--mono);
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+
+.admin-tab.active{
+  background:var(--ink);
+  color:var(--cream);
+  border-color:var(--ink);
+}
+
+.admin-overview{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:32px;
+}
+
+.admin-stat{
+  background:#17130f;
+  color:var(--cream);
+  padding:25px;
+  min-height:140px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+
+.admin-stat small{
+  font:400 8px var(--mono);
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:#93897c;
+}
+
+.admin-stat strong{
+  font:400 48px/.9 var(--serif);
+}
+
+.admin-stat span{
+  font:400 9px var(--mono);
+  color:#aaa092;
+}
+
+.request-filters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-bottom:24px;
+}
+
+.request-filter{
+  border:1px solid var(--line);
+  background:transparent;
+  padding:9px 12px;
+  font:400 8px var(--mono);
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+
+.request-filter.active{
+  background:var(--ink);
+  color:var(--cream);
+}
+
+.request-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:28px;
+  padding:25px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.request-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+
+.request-tag{
+  display:inline-flex;
+  border:1px solid var(--line);
+  padding:6px 8px;
+  font:400 8px var(--mono);
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+.request-tag.public{
+  background:#dfe6da;
+}
+
+.request-tag.private{
+  background:#eee5d6;
+}
+
+.request-tag.pending{
+  background:#eee5d6;
+}
+
+.request-title{
+  font:400 27px/1.05 var(--serif);
+  margin:12px 0 8px;
+}
+
+.request-meta{
+  font:400 9px/1.7 var(--mono);
+  color:var(--muted);
+  letter-spacing:.05em;
+  text-transform:uppercase;
+}
+
+.request-about{
+  margin-top:12px;
+  font-size:12px;
+  line-height:1.65;
+  color:var(--muted);
+  max-width:780px;
+}
+
+.request-rule{
+  margin-top:12px;
+  font:400 8px/1.6 var(--mono);
+  letter-spacing:.07em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+.request-actions{
+  display:flex;
+  align-items:flex-start;
+  gap:6px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+.request-actions button{
+  border:1px solid var(--line);
+  background:transparent;
+  padding:10px 12px;
+  font:400 8px var(--mono);
+  letter-spacing:.07em;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+
+.request-actions .primary{
+  background:var(--ink);
+  color:var(--cream);
+}
+
+.request-actions .danger{
+  color:#7d5047;
+}
+
+.admin-info{
+  border:1px solid var(--line);
+  padding:17px 19px;
+  margin-bottom:25px;
+  font:400 9px/1.75 var(--mono);
+  color:var(--muted);
+}
+
+@media(max-width:850px){
+
+  .admin-overview{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .request-row{
+    grid-template-columns:1fr;
+  }
+
+  .request-actions{
+    justify-content:flex-start;
+  }
+
+}
+
+@media(max-width:600px){
+
+  .admin-overview{
+    gap:8px;
+  }
+
+  .admin-stat{
+    padding:20px;
+    min-height:120px;
+  }
+
+  .admin-stat strong{
+    font-size:40px;
+  }
+
+}
+
+</style>
+
+</head>
+
+<body class="admin-body">
+
+<div class="progress"></div>
+
+
+<nav class="nav">
+
+<a
+  class="brand"
+  href="index.html"
+>
+;AFTR
+<span>ADMIN</span>
+</a>
+
+<div></div>
+
+<div class="navlinks">
+
+<a href="index.html">
+Website ↗
+</a>
+
+<a href="events.html">
+Public Events ↗
+</a>
+
+</div>
+
+<button
+  class="menu-toggle"
+  type="button"
+  aria-label="Open navigation"
+  aria-expanded="false"
+>
+<span></span>
+<span></span>
+<span></span>
+</button>
+
+</nav>
+
+
+<main class="admin-main">
+
+
+<section class="admin-head">
+
+<div>
+
+<div class="eyebrow">
+AFTR control room
+</div>
+
+<h1>
+Manage the
+<em>experience.</em>
+</h1>
+
+<p>
+All requests, public events, confirmed time
+and menu files — in one place.
+</p>
+
+</div>
+
+<div class="admin-status">
+
+<span class="status-dot"></span>
+
+<span id="apiStatus">
+Connecting…
+</span>
+
+</div>
+
+</section>
+
+
+<section
+  id="adminLogin"
+  class="admin-login"
+>
+
+<div class="admin-card narrow">
+
+<span class="eyebrow">
+Private access
+</span>
+
+<h2>
+Enter admin PIN
+</h2>
+
+<input
+  id="adminPin"
+  type="password"
+  placeholder="Admin PIN"
+>
+
+<button
+  id="loginBtn"
+  class="premium-submit"
+>
+Open dashboard
+<span>↗</span>
+</button>
+
+<p
+  id="loginError"
+  class="admin-error"
+></p>
+
+</div>
+
+</section>
+
+
+<section
+  id="dashboard"
+  class="dashboard"
+  hidden
+>
+
+
+<div class="admin-tabs">
+
+<button
+  class="admin-tab active"
+  data-tab="overview"
+>
+Overview
+</button>
+
+<button
+  class="admin-tab"
+  data-tab="requests"
+>
+Requests
+</button>
+
+<button
+  class="admin-tab"
+  data-tab="published"
+>
+Published Events
+</button>
+
+<button
+  class="admin-tab"
+  data-tab="calendar"
+>
+Calendar & Availability
+</button>
+
+<button
+  class="admin-tab"
+  data-tab="menu"
+>
+Menu PDFs
+</button>
+
+</div>
+
+
+<!-- =====================================================
+     OVERVIEW
+     ===================================================== -->
+
+<section
+  id="adminTab-overview"
+  class="dash-panel"
+>
+
+<div class="panel-head">
+
+<div>
+
+<span class="eyebrow">
+01 / Overview
+</span>
+
+<h2>
+At a glance.
+</h2>
+
+</div>
+
+</div>
+
+
+<div class="admin-overview">
+
+<div class="admin-stat">
+
+<small>
+Pending requests
+</small>
+
+<strong id="statPending">
+0
+</strong>
+
+<span>
+Needs attention
+</span>
+
+</div>
+
+
+<div class="admin-stat">
+
+<small>
+Live events
+</small>
+
+<strong id="statPublished">
+0
+</strong>
+
+<span>
+Published on website
+</span>
+
+</div>
+
+
+<div class="admin-stat">
+
+<small>
+Calendar entries
+</small>
+
+<strong id="statCalendar">
+0
+</strong>
+
+<span>
+Active confirmed time
+</span>
+
+</div>
+
+
+<div class="admin-stat">
+
+<small>
+Menu PDFs
+</small>
+
+<strong id="statMenus">
+0
+</strong>
+
+<span>
+Currently active
+</span>
+
+</div>
+
+</div>
+
+
+<div class="admin-info">
+
+<strong>Publishing rule:</strong>
+
+Workshop and Partner With Us → Events are public
+after approval.
+
+Reserve a Table, Product Showcase,
+Brand Promotion and Collaboration remain private.
+
+Every approved request goes to email + Google Calendar.
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     REQUESTS
+     ===================================================== -->
+
+<section
+  id="adminTab-requests"
+  class="dash-panel"
+  hidden
+>
+
+<div class="panel-head">
+
+<div>
+
+<span class="eyebrow">
+02 / Requests
+</span>
+
+<h2>
+What needs attention?
+</h2>
+
+</div>
+
+</div>
+
+
+<div class="admin-info">
+
+Only pending requests appear here.
+When you approve or reject a request,
+it automatically leaves this list.
+
+</div>
+
+
+<div
+  id="requestFilters"
+  class="request-filters"
+>
+
+<button
+  class="request-filter active"
+  data-filter="all"
+>
+All
+</button>
+
+<button
+  class="request-filter"
+  data-filter="Table Reservations"
+>
+Reserve a Table
+</button>
+
+<button
+  class="request-filter"
+  data-filter="Book a Space"
+>
+Book a Space
+</button>
+
+<button
+  class="request-filter"
+  data-filter="Partner With Us"
+>
+Partner With Us
+</button>
+
+</div>
+
+
+<div
+  id="requestList"
+  class="admin-list"
+></div>
+
+</section>
+
+
+<!-- =====================================================
+     PUBLISHED
+     ===================================================== -->
+
+<section
+  id="adminTab-published"
+  class="dash-panel"
+  hidden
+>
+
+<div class="panel-head">
+
+<div>
+
+<span class="eyebrow">
+03 / Published events
+</span>
+
+<h2>
+Live on AFTR.
+</h2>
+
+</div>
+
+</div>
+
+
+<div class="admin-info">
+
+Only these two request types can appear here:
+
+<strong>
+Book a Space → Workshop
+</strong>
+
+and
+
+<strong>
+Partner With Us → Events
+</strong>
+
+</div>
+
+
+<div
+  id="publishedEventList"
+  class="admin-list"
+></div>
+
+</section>
+
+
+<!-- =====================================================
+     CALENDAR
+     ===================================================== -->
+
+<section
+  id="adminTab-calendar"
+  class="dash-panel"
+  hidden
+>
+
+<div class="panel-head">
+
+<div>
+
+<span class="eyebrow">
+04 / Calendar & Availability
+</span>
+
+<h2>
+Confirmed time.
+</h2>
+
+</div>
+
+<button
+  id="newBlock"
+  class="small-action"
+>
++ Manual block
+</button>
+
+</div>
+
+
+<div class="admin-info">
+
+All approved requests appear here,
+including private reservations and
+public events. Manual blocks can also
+be added by the AFTR team.
+
+</div>
+
+
+<div
+  id="availabilityList"
+  class="admin-list"
+></div>
+
+</section>
+
+
+<!-- =====================================================
+     MENU
+     ===================================================== -->
+
+<section
+  id="adminTab-menu"
+  class="dash-panel"
+  hidden
+>
+
+<div class="panel-head">
+
+<div>
+
+<span class="eyebrow">
+05 / Menu management
+</span>
+
+<h2>
+Menu PDFs.
+</h2>
+
+</div>
+
+<button
+  id="refreshMenu"
+  class="small-action"
+>
+Refresh
+</button>
+
+</div>
+
+
+<div class="admin-info">
+
+Upload or replace a menu PDF here.
+The website does not need to be rebuilt.
+
+</div>
+
+
+<div class="menu-upload-card">
+
+<form
+  id="menuUploadForm"
+  class="admin-form"
+>
+
+<div class="admin-grid">
+
+<label>
+Menu title
+
+<input
+  id="menuTitle"
+  required
+  placeholder="e.g. Main Menu"
+>
+
+</label>
+
+
+<label>
+PDF file
+
+<input
+  id="menuFile"
+  type="file"
+  accept="application/pdf"
+  required
+>
+
+</label>
+
+</div>
+
+
+<button
+  class="premium-submit"
+  type="submit"
+>
+Upload menu PDF
+<span>↗</span>
+</button>
+
+
+<div
+  id="menuUploadStatus"
+  class="booking-success"
+></div>
+
+</form>
+
+</div>
+
+
+<div
+  id="menuAdminList"
+  class="admin-list"
+  style="margin-top:30px"
+></div>
+
+</section>
+
+</section>
+
+
+</main>
+
+
+<div
+  id="adminModal"
+  class="admin-modal"
+  aria-hidden="true"
+>
+
+<div class="admin-modal-backdrop"></div>
+
+<div class="admin-card">
+
+<button
+  id="adminClose"
+  class="event-close"
+>
+×
+</button>
+
+<div id="modalForm"></div>
+
+</div>
+
+</div>
+
+
+<script src="js/config.js"></script>
+<script src="js/main.js"></script>
+<script src="js/admin.js"></script>
+
+</body>
+</html>

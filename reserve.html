@@ -1,0 +1,134 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#15120f"><title>Reserve a Table — AFTR</title><link rel="stylesheet" href="css/style.css"></head><body><div class="progress"></div><div class="cursor"></div>
+
+<nav class="nav"><a class="brand" href="index.html">;AFTR<span>ALL DAY CAFE</span></a><div></div><div class="navlinks"><a href="index.html">Home</a><a href="events.html">Events</a><a href="book.html">Book a Space</a><a href="partner.html">Partner With Us</a><a href="experience.html">Experience</a><a href="about.html">What is AFTR</a><a href="contact.html">Contact</a></div><button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button></nav>
+
+<main class="page">
+
+<section class="page-hero booking-hero">
+
+<div class="container">
+
+<div class="eyebrow">
+Reserve a table
+</div>
+
+<h1>
+Your table,<br>
+<em>held.</em>
+</h1>
+
+<p>
+Choose your preferred date and time.
+AFTR will confirm the reservation with you.
+No payment is taken online.
+</p>
+
+</div>
+
+</section>
+
+<section class="booking-shell">
+
+<div class="container">
+
+<div class="booking-layout">
+
+<div class="booking-intro">
+
+<span class="eyebrow">
+01 / Table reservation
+</span>
+
+<h2>
+Make a little<br>
+<i>room for the day.</i>
+</h2>
+
+<p>
+Table reservations are intentionally kept separate from space bookings.
+Use this form only for a regular cafe table.
+</p>
+
+</div>
+
+<div class="booking-card">
+
+<form id="reserveForm" class="premium-form">
+
+<div class="availability-picker">
+
+<label>
+<span>Date</span>
+<input id="rDate" type="date" required>
+</label>
+
+<label>
+<span>Start</span>
+<input id="rStart" type="time" required>
+</label>
+
+<label>
+<span>End</span>
+<input id="rEnd" type="time" required>
+</label>
+
+</div>
+
+<div id="reserveAvailabilityMessage" class="availability-message">
+Choose a date and time to check availability.
+</div>
+
+<div class="form-grid">
+
+<div class="field light">
+<input id="rName" required placeholder=" ">
+<label>Your name</label>
+</div>
+
+<div class="field light">
+<input id="rPhone" required inputmode="tel" placeholder=" ">
+<label>WhatsApp number</label>
+</div>
+
+<div class="field light">
+<input id="rEmail" type="email" placeholder=" ">
+<label>Email</label>
+</div>
+
+<div class="field light">
+<input id="rGuests" type="number" min="1" max="30" required placeholder=" ">
+<label>Number of guests</label>
+</div>
+
+<div class="field light full">
+<textarea id="rMessage" rows="4" placeholder=" "></textarea>
+<label>Anything we should know?</label>
+</div>
+
+</div>
+
+<button class="premium-submit" type="submit">
+Reserve this table <span>↗</span>
+</button>
+
+<div id="reserveSuccess" class="booking-success" aria-live="polite"></div>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+<footer class="footer"><div class="container"><div class="footer-top"><div class="footer-logo">;AFTR</div><div class="footer-meta">All day cafe<br><br>RTO Office Rd, Gadge Nagar<br>Amravati, Maharashtra 444602<br><br>12:00 — 00:00 · Every day</div></div><div class="footer-bottom"><span>AFTR — Table reservations</span><span>Amravati · Maharashtra</span></div></div></footer>
+
+<script src="js/config.js"></script>
+<script src="js/main.js"></script>
+<script src="js/reserve.js"></script>
+
+</body></html>

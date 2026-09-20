@@ -1,0 +1,57 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#15120f"><meta name="description" content="AFTR — All Day Cafe in Amravati. Coffee, matcha, food and slow moments, all day."><title>AFTR — All Day Cafe</title><link rel="stylesheet" href="css/style.css">
+<style>
+.home-reviews{padding:105px 0 88px;background:var(--cream);overflow:hidden}
+.reviews-head{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:28px}
+.reviews-head h2{font:400 clamp(46px,6vw,82px)/.9 var(--serif);letter-spacing:-.04em;margin:14px 0 0}
+.reviews-side{text-align:right;min-width:150px}
+.reviews-rating{display:flex;align-items:baseline;justify-content:flex-end;gap:6px}
+.reviews-rating strong{font:400 36px/1 var(--serif)}
+.reviews-rating span{font:400 11px var(--mono);color:var(--muted)}
+.reviews-count{margin-top:7px;font:400 9px/1.5 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.review-rail{display:flex;gap:16px;overflow-x:auto;overflow-y:hidden;padding:5px 2px 18px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.review-rail::-webkit-scrollbar{display:none}
+.review-card{flex:0 0 min(405px,82vw);min-height:255px;background:#17130f;color:var(--cream);padding:28px 28px 24px;display:flex;flex-direction:column;justify-content:space-between;scroll-snap-align:start}
+.review-card-top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}
+.review-number{font:400 9px var(--mono);letter-spacing:.12em;color:#8d8478}
+.review-stars{font:400 12px var(--sans);letter-spacing:.18em;color:#f1e4cc;white-space:nowrap}
+.review-text{font:400 clamp(19px,2vw,25px)/1.32 var(--serif);max-width:350px;margin:28px 0 24px}
+.review-author{font:400 9px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#aaa092}
+.reviews-footer{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-top:10px;font:400 9px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.review-all-link{color:inherit;text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:3px}
+@media(max-width:800px){
+  .home-reviews{padding:75px 0 70px}
+  .reviews-head{display:block}
+  .reviews-side{text-align:left;margin-top:22px}
+  .reviews-rating{justify-content:flex-start}
+  .review-card{flex-basis:84vw;min-height:245px;padding:24px}
+  .reviews-footer{margin-top:3px}
+}
+</style>
+</head><body><div class="progress"></div><div class="cursor"></div>
+
+<nav class="nav"><a class="brand" href="index.html">;AFTR<span>ALL DAY CAFE</span></a><div></div><div class="navlinks"><a href="index.html">Home</a><a href="events.html">Events</a><a href="book.html">Book a Space</a><a href="partner.html">Partner With Us</a><a href="experience.html">Experience</a><a href="about.html">What is AFTR</a><a href="contact.html">Contact</a></div><button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button></nav>
+
+<main class="page">
+
+<section class="hero"><video autoplay muted loop playsinline preload="metadata"><source src="assets/aftr-hero.mp4" type="video/mp4"></video><div class="hero-content"><div class="hero-copy"><div class="eyebrow" style="color:#ddd;margin-bottom:22px">Amravati · All Day</div><h1 class="hero-title">A day at <em>Aftr.</em></h1><div class="hero-actions"><button type="button" class="hero-action hero-action-light" id="openMenu">View Menu <span>↗</span></button><a class="hero-action hero-action-outline" href="reserve.html">Reserve a Table <span>↗</span></a></div></div><div class="hero-meta"><div>RTO Office Rd<br>Gadge Nagar, Amravati</div><div>12:00 — 00:00<br>Every day</div></div></div><div class="scroll-cue">Scroll</div></section>
+
+<section class="intro"><div class="container intro-grid"><div class="eyebrow reveal">01 / The place</div><div class="reveal"><div class="intro-statement">Not a stop between plans. <em>A place to stay.</em></div><p class="micro" style="margin-top:38px">Coffee when you need it. Something good to eat. A little more time than you planned for.</p></div></div></section>
+
+<section class="home-upcoming"><div class="container"><div class="section-head"><div><span class="eyebrow">02 / Coming up</span><h2>Next at <i>AFTR.</i></h2></div><a class="text-link" href="events.html">View all events ↗</a></div><div id="homeEventsGrid" class="home-events-grid"></div><div id="homeEventsEmpty" class="events-empty" hidden>No upcoming events are published yet. Check back soon.</div></div></section>
+
+<section class="home-reviews"><div class="container"><div class="reviews-head"><div><span class="eyebrow">03 / The word on AFTR</span><h2>People talk.<br><i>We listen.</i></h2></div><div class="reviews-side"><div class="reviews-rating"><strong>4.7</strong><span>/ 5</span></div><div class="reviews-count">Google reviews</div></div></div><div id="homeReviewsTrack" class="review-rail" aria-label="AFTR customer reviews"></div><div class="reviews-footer"><span>Swipe to read more</span><a class="review-all-link" href="https://share.google/9luRFC4YHx65Wfd2a" target="_blank" rel="noopener">View all reviews ↗</a></div></div></section>
+
+<section class="home-cta"><div class="container"><div class="home-cta-copy"><span class="eyebrow">04 / Make a plan</span><h2>Use the space<br><i>your way.</i></h2><p>Workshops, showcases and brand moments — bring the idea, and AFTR will help shape the space.</p></div><div class="home-cta-actions"><a href="book.html" class="premium-submit">Book a Space <span>↗</span></a><a href="partner.html" class="premium-submit secondary">Partner With Us <span>↗</span></a></div></div></section>
+
+</main>
+
+<footer class="footer"><div class="container"><div class="footer-top"><div class="footer-logo">;AFTR</div><div class="footer-meta">All day cafe<br><br>RTO Office Rd, Gadge Nagar<br>Amravati, Maharashtra 444602<br><br>12:00 — 00:00 · Every day</div></div><div class="footer-bottom"><span>AFTR — ALL DAY CAFE</span><span>Amravati · Maharashtra</span></div></div></footer>
+
+<div id="menuModal" class="event-modal" aria-hidden="true"><div class="event-modal-backdrop"></div><article class="event-modal-card menu-modal-card"><button id="menuClose" class="event-close" aria-label="Close">×</button><div class="event-modal-content"><span class="eyebrow">AFTR / Menu</span><h2>Choose your<br><em>menu.</em></h2><p id="menuIntro">Latest menu PDFs from the AFTR team.</p><div id="menuList" class="menu-pdf-list"></div></div></article></div>
+
+<script src="js/config.js"></script>
+<script src="js/main.js"></script>
+<script src="js/home-events.js"></script>
+<script src="js/home-reviews.js"></script>
+<script src="js/menu.js"></script>
+</body></html>

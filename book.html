@@ -1,0 +1,170 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#15120f"><meta name="description" content="Book a space at AFTR for workshops, product showcases and brand promotion."><title>Book a Space — AFTR</title><link rel="stylesheet" href="css/style.css"></head><body><div class="progress"></div><div class="cursor"></div>
+
+<nav class="nav"><a class="brand" href="index.html">;AFTR<span>ALL DAY CAFE</span></a><div></div><div class="navlinks"><a href="index.html">Home</a><a href="events.html">Events</a><a href="book.html">Book a Space</a><a href="partner.html">Partner With Us</a><a href="experience.html">Experience</a><a href="about.html">What is AFTR</a><a href="contact.html">Contact</a></div><button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button></nav>
+
+<main class="page">
+
+<section class="page-hero booking-hero"><div class="container"><div class="eyebrow">04 / Book a space</div><h1>Bring your<br><em>session.</em></h1><p>For independent hosts who want to run a workshop, product showcase or brand promotion inside AFTR. Private/full-cafe events are handled through Partner With Us.</p></div></section>
+
+<section class="booking-shell"><div class="container"><div class="booking-layout">
+
+<div class="booking-intro">
+<span class="eyebrow">01 / Choose your format</span>
+<h2>One space.<br><i>Many ideas.</i></h2>
+<p>Select what you are planning, choose your date and time, then send the request to AFTR. Nothing is published until the team approves it.</p>
+<div class="booking-note"><span>↗</span><div><strong>Publish after approval</strong><br><small>Your request appears in the AFTR admin panel first. Once approved, it becomes a public upcoming event.</small></div></div>
+</div>
+
+<div class="booking-card">
+
+<form id="spaceForm" class="premium-form">
+
+<div class="booking-types" role="tablist">
+
+<button type="button" class="booking-type active" data-type="Workshop">
+Workshop
+</button>
+
+<button type="button" class="booking-type" data-type="Product Showcase">
+Product showcase
+</button>
+
+<button type="button" class="booking-type" data-type="Brand Promotion">
+Brand promotion
+</button>
+
+</div>
+
+<input type="hidden" id="spaceType" value="Workshop">
+
+<div class="slot-panel">
+
+<div class="slot-head">
+
+<div>
+<span class="eyebrow">02 / Date & time</span>
+<h3>Your requested slot</h3>
+</div>
+
+<span class="slot-status" id="spaceLiveStatus">
+● Live availability
+</span>
+
+</div>
+
+<div class="availability-picker">
+
+<label>
+<span>Date</span>
+<input id="sDate" type="date" required>
+</label>
+
+<label>
+<span>Start</span>
+<input id="sStart" type="time" required>
+</label>
+
+<label>
+<span>End</span>
+<input id="sEnd" type="time" required>
+</label>
+
+</div>
+
+<div id="spaceAvailabilityMessage" class="availability-message">
+Choose a date and time to check the latest availability.
+</div>
+
+</div>
+
+<div class="form-grid">
+
+<div class="field light">
+<input id="sTitle" required placeholder=" ">
+<label>Activity / event name</label>
+</div>
+
+<div class="field light">
+<input id="sOrg" required placeholder=" ">
+<label>Your name / brand</label>
+</div>
+
+<div class="field light">
+<input id="sPhone" required inputmode="tel" placeholder=" ">
+<label>WhatsApp number</label>
+</div>
+
+<div class="field light">
+<input id="sEmail" type="email" placeholder=" ">
+<label>Email</label>
+</div>
+
+<div class="field light">
+<input id="sPrice" placeholder=" ">
+<label>Pricing / entry</label>
+</div>
+
+<div class="field light">
+<input id="sGuests" type="number" min="1" max="300" placeholder=" ">
+<label>Expected guests</label>
+</div>
+
+<div class="field light full">
+<textarea id="sAbout" rows="5" required placeholder=" "></textarea>
+<label>Tell us about the activity</label>
+</div>
+
+<div class="field light full">
+<input id="sImage" type="file" accept="image/*" multiple>
+<label class="file-label">Poster / event photos (up to 4)</label>
+</div>
+
+</div>
+
+<button class="premium-submit" type="submit">
+Send space request <span>↗</span>
+</button>
+
+<div id="spaceSuccess" class="booking-success" aria-live="polite"></div>
+
+</form>
+
+</div>
+
+</div></div></section>
+
+<section class="booking-use"><div class="container"><div class="section-head"><h2>Made for things<br><i>worth gathering for.</i></h2></div>
+
+<div class="use-grid">
+
+<article>
+<span>01</span>
+<h3>Workshops</h3>
+<p>Classes, skill sessions, talks and small hands-on experiences.</p>
+</article>
+
+<article>
+<span>02</span>
+<h3>Product showcases</h3>
+<p>Introduce a new product or small collection to an AFTR audience.</p>
+</article>
+
+<article>
+<span>03</span>
+<h3>Brand promotion</h3>
+<p>Bring a campaign, pop-up or community-facing brand activity into the space.</p>
+</article>
+
+</div>
+
+</div></section>
+
+</main>
+
+<footer class="footer"><div class="container"><div class="footer-top"><div class="footer-logo">;AFTR</div><div class="footer-meta">All day cafe<br><br>RTO Office Rd, Gadge Nagar<br>Amravati, Maharashtra 444602<br><br>12:00 — 00:00 · Every day</div></div><div class="footer-bottom"><span>AFTR — ALL DAY CAFE</span><span>Book a space · Amravati</span></div></div></footer>
+
+<script src="js/config.js"></script>
+<script src="js/main.js"></script>
+<script src="js/space-booking.js"></script>
+
+</body></html>
