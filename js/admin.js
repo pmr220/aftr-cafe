@@ -3,9 +3,9 @@
   const API =
     window.AFTR_API_URL || '';
 
-  const PIN =
-    window.AFTR_ADMIN_PIN ||
-    'AFTR2026';
+  let adminToken = "";
+  let expiresAt = 0;
+  let expiryTimer;
 
 
   const login =
@@ -119,76 +119,49 @@
      LOGIN
      ======================================================= */
 
-  document
-    .querySelector(
-      '#loginBtn'
-    )
-    .addEventListener(
-      'click',
-      async () => {
+  function signOut(message = '') {
+    adminToken = '';
+    expiresAt = 0;
+    clearTimeout(expiryTimer);
+    dashboard.hidden = true;
+    login.hidden = false;
+    requests = []; events = []; calendarEntries = []; menus = [];
+    closeModal();
+    renderAll();
+    document.querySelector('#loginError').textContent = message;
+    window.google?.accounts.id.disableAutoSelect();
+  }
 
-        const value =
-          document
-            .querySelector(
-              '#adminPin'
-            )
-            .value;
-
-
-        if (
-          value !==
-          PIN
-        ) {
-
-          document
-            .querySelector(
-              '#loginError'
-            )
-            .textContent =
-              'Incorrect PIN.';
-
-          return;
-
+  document.querySelector('#adminSignOut').addEventListener('click', () => signOut());
+  window.aftrInitGoogleLogin = () => {
+    google.accounts.id.initialize({
+      client_id: window.AFTR_GOOGLE_CLIENT_ID,
+      auto_select: false,
+      callback: async ({ credential }) => {
+        const errorBox = document.querySelector('#loginError');
+        errorBox.textContent = 'Verifying sign-in…';
+        try {
+          const response = await fetch('/api/admin-login', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ credential }), cache: 'no-store'
+          });
+          const result = await response.json();
+          if (!response.ok || !result.token) throw new Error(result.error || 'Sign-in failed.');
+          adminToken = result.token;
+          expiresAt = result.expiresAt;
+          clearTimeout(expiryTimer);
+          expiryTimer = setTimeout(() => signOut('Session expired. Please sign in again.'), Math.max(0, expiresAt - Date.now()));
+          errorBox.textContent = '';
+          login.hidden = true;
+          dashboard.hidden = false;
+          await refreshAll();
+        } catch (error) {
+          signOut(error.message);
         }
-
-
-        login.hidden =
-          true;
-
-        dashboard.hidden =
-          false;
-
-
-        await refreshAll();
-
       }
-    );
-
-
-  document
-    .querySelector(
-      '#adminPin'
-    )
-    .addEventListener(
-      'keydown',
-      event => {
-
-        if (
-          event.key ===
-          'Enter'
-        ) {
-
-          document
-            .querySelector(
-              '#loginBtn'
-            )
-            .click();
-
-        }
-
-      }
-    );
-
+    });
+    google.accounts.id.renderButton(document.querySelector('#googleSignIn'), { theme: 'outline', size: 'large' });
+  };
 
   /* =======================================================
      TABS
@@ -265,107 +238,28 @@
      API
      ======================================================= */
 
-  async function post(
-    payload
-  ) {
-
-    if (!API) {
-
-      throw new Error(
-        'AFTR backend URL is not configured.'
-      );
-
+  async function post(payload) {
+    if (!adminToken || Date.now() >= expiresAt) {
+      signOut('Session expired. Please sign in again.');
+      throw new Error('Please sign in again.');
     }
-
-
-    const response =
-      await fetch(
-        API,
-        {
-          method:
-            'POST',
-
-          headers:
-            {
-              'Content-Type':
-                'text/plain;charset=utf-8'
-            },
-
-          body:
-            JSON.stringify(
-              payload
-            )
-
-        }
-      );
-
-
-    const data =
-      await response.json();
-
-
-    if (
-      !data.ok
-    ) {
-
-      throw new Error(
-        data.error ||
-        'Backend request failed.'
-      );
-
+    const usedToken = adminToken;
+    const response = await fetch(API, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ ...payload, adminToken: usedToken })
+    });
+    const data = await response.json();
+    if (usedToken !== adminToken) throw new Error('Session ended.');
+    if (!data.ok) {
+      if (data.code === 'UNAUTHORIZED') signOut('Please sign in again.');
+      throw new Error(data.error || 'Backend request failed.');
     }
-
-
     return data;
-
   }
 
-
-  async function get(
-    action
-  ) {
-
-    if (!API) {
-      throw new Error(
-        'AFTR backend URL is not configured.'
-      );
-    }
-
-
-    const response =
-      await fetch(
-        API +
-        '?action=' +
-        encodeURIComponent(
-          action
-        ),
-        {
-          cache:
-            'no-store'
-        }
-      );
-
-
-    const data =
-      await response.json();
-
-
-    if (
-      !data.ok
-    ) {
-
-      throw new Error(
-        data.error ||
-        'Backend read failed.'
-      );
-
-    }
-
-
-    return data;
-
+  async function get(action) {
+    return post({ action: action === 'availability' ? 'admin_availability' : action });
   }
-
 
   /* =======================================================
      REFRESH

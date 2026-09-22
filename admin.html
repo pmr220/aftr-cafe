@@ -332,23 +332,9 @@ Connecting…
 Private access
 </span>
 
-<h2>
-Enter admin PIN
-</h2>
-
-<input
-  id="adminPin"
-  type="password"
-  placeholder="Admin PIN"
->
-
-<button
-  id="loginBtn"
-  class="premium-submit"
->
-Open dashboard
-<span>↗</span>
-</button>
+<h2>Sign in to admin</h2>
+<p>Use your authorised Google account. Sessions last up to 15 minutes.</p>
+<div id="googleSignIn"></div>
 
 <p
   id="loginError"
@@ -367,6 +353,7 @@ Open dashboard
 >
 
 
+<button id="adminSignOut" type="button">Sign out</button>
 <div class="admin-tabs">
 
 <button
@@ -844,6 +831,7 @@ Upload menu PDF
 <script src="js/config.js"></script>
 <script src="js/main.js"></script>
 <script src="js/admin.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer onload="window.aftrInitGoogleLogin()" onerror="document.getElementById('loginError').textContent='Google sign-in could not load. Please refresh.'"></script>
 
 </body>
 </html>

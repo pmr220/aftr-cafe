@@ -1,0 +1,5 @@
+node_modules/
+.pnpm-store/
+.env*
+.vercel/
+AFTR-backend-current.txt

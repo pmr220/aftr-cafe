@@ -1,0 +1,6 @@
+{
+  "name": "aftr-cafe",
+  "private": true,
+  "scripts": { "test": "node --test tests/*.test.cjs" },
+  "dependencies": { "google-auth-library": "^10.3.0" }
+}

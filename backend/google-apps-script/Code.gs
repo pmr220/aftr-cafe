@@ -1217,8 +1217,8 @@ function saveImage_(
    GET
    ========================================================= */
 
-function doGet(
-  e
+function readAction_(
+  e, isAdmin
 ) {
 
   try {
@@ -1229,6 +1229,10 @@ function doGet(
         ? e.parameter.action || ''
         : '';
 
+
+    if (['admin_requests', 'admin_events'].indexOf(action) !== -1 && !isAdmin) {
+      return unauthorized_();
+    }
 
     /* -----------------------------------------------
        PUBLIC EVENTS
@@ -1396,7 +1400,10 @@ function doGet(
                 'active'
             )
             .map(
-              calendarBlock_
+              item => {
+                const block = calendarBlock_(item);
+                return isAdmin ? block : { date: block.date, start: block.start, end: block.end, status: block.status, note: 'Unavailable' };
+              }
             )
 
       });
@@ -1843,6 +1850,14 @@ function doPost(
         '{}'
       );
 
+
+    const publicActions = ['submit_event', 'booking', 'collaboration'];
+    if (publicActions.indexOf(data.action) === -1) {
+      if (!verifyAdminToken_(data.adminToken)) return unauthorized_();
+      if (['admin_requests', 'admin_events', 'admin_availability', 'menu'].indexOf(data.action) !== -1) {
+        return readAction_({ parameter: { action: data.action === 'admin_availability' ? 'availability' : data.action } }, true);
+      }
+    }
 
     switch (
       data.action
@@ -4769,3 +4784,35 @@ function deleteMenuPdf_(
 /* =========================================================
    DONE
    ========================================================= */
+
+// All private reads use authenticated POST; credentials never appear in URLs.
+function doGet(e) { return readAction_(e, false); }
+
+function unauthorized_() {
+  return json_({ ok: false, code: 'UNAUTHORIZED', error: 'Admin sign-in required.' });
+}
+
+function verifyAdminToken_(token) {
+  try {
+    if (typeof token !== 'string' || token.length > 4096) return false;
+    const parts = token.split('.');
+    if (parts.length !== 2 || !/^[A-Za-z0-9_-]+$/.test(parts[0]) || !/^[A-Za-z0-9_-]{43}$/.test(parts[1])) return false;
+    const properties = PropertiesService.getScriptProperties();
+    const secret = properties.getProperty('AFTR_ADMIN_SIGNING_SECRET');
+    const email = properties.getProperty('AFTR_ADMIN_EMAIL');
+    const audience = properties.getProperty('AFTR_GOOGLE_CLIENT_ID');
+    if (!secret || secret.length < 40 || !email || !audience) return false;
+    const expected = Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(parts[0], secret)).replace(/=+$/, '');
+    let mismatch = expected.length ^ parts[1].length;
+    for (let i = 0; i < expected.length; i++) mismatch |= expected.charCodeAt(i) ^ parts[1].charCodeAt(i);
+    if (mismatch !== 0) return false;
+    const claims = JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(parts[0])).getDataAsString());
+    const now = Math.floor(Date.now() / 1000);
+    return claims.iss === 'aftr-admin' && claims.aud === audience &&
+      typeof claims.sub === 'string' && claims.sub.length > 0 &&
+      claims.email === email.trim().toLowerCase() &&
+      Number.isFinite(claims.iat) && Number.isFinite(claims.exp) &&
+      claims.iat <= now + 30 && claims.exp > now &&
+      claims.exp > claims.iat && claims.exp - claims.iat <= 900;
+  } catch (_) { return false; }
+}

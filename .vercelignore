@@ -1,0 +1,6 @@
+backend/
+tests/
+scripts/
+AFTR-backend-current.txt
+README.txt
+.pnpm-store/
