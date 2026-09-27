@@ -70,6 +70,21 @@
     font-size:54px
   }
 }
+
+/* Approved story composition; confined to the About page. */
+.about-hero-brand{font-family:var(--sans);font-weight:500;letter-spacing:.02em;white-space:nowrap}
+.about-story .about-grid{display:block}
+.about-story .about-copy{max-width:760px;margin:28px auto 0}
+.about-story .meaning{position:relative;max-width:560px;height:240px;margin:-6px auto 0;display:flex;align-items:center;justify-content:center}
+.about-story .wordmark{font:500 clamp(65px,13vw,102px)/1 var(--sans);letter-spacing:.02em;color:var(--ink)}
+.about-story .connector{position:absolute;width:24%;height:105px;overflow:visible;color:var(--muted)}
+.about-story .above{left:1%;top:0}
+.about-story .below{right:1%;bottom:0}
+@media(max-width:420px){
+  .about-story .meaning{height:210px}
+  .about-story .connector{width:25%;height:88px}
+}
+
 </style>
 
 </head><body><div class="progress"></div><div class="cursor"></div>
@@ -81,18 +96,18 @@
 <section class="page-hero">
 <div class="container">
 <div class="eyebrow">AFTR / What is AFTR</div>
-<h1>Everything<br><em>comes AFTR.</em></h1>
+<h1>Everything<br><em>comes</em> <span class="about-hero-brand">;AFTR</span></h1>
 <p>A short story about what AFTR is, what the space stands for, and why the pause matters.</p>
 </div>
 </section>
 
-<section class="about-intro">
+<section class="about-intro about-story">
 
 <div class="container about-grid">
 
 <div>
 <span class="eyebrow">01 / A little about us</span>
-<h2>What is<br><i>AFTR?</i></h2>
+
 </div>
 
 <div class="about-copy">
@@ -107,6 +122,12 @@ AFTR is a place of solace, specially curated for everything that comes AFTR.
 The Semicolon is a latin symbol that denotes a Pause,
 it means there’s a break that gears you up for what follows AFTR.
 </p>
+
+<div class="meaning">
+    <svg class="connector above" viewBox="0 0 120 110" role="img" aria-label="The semicolon points up to the explanation of a pause"><defs><marker id="aftr-story-up" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6" fill="none" stroke="currentColor" stroke-width="1.2"/></marker></defs><path d="M115 100 C75 108 8 83 21 51 C32 24 76 32 70 55 C62 79 13 54 24 9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" marker-end="url(#aftr-story-up)"/></svg>
+    <div class="wordmark">;AFTR</div>
+    <svg class="connector below" viewBox="0 0 120 110" role="img" aria-label="AFTR points down to the paragraph about sharing the pause"><defs><marker id="aftr-story-down" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6" fill="none" stroke="currentColor" stroke-width="1.2"/></marker></defs><path d="M5 10 C48 1 112 27 99 59 C88 86 44 78 50 55 C58 31 107 56 96 101" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" marker-end="url(#aftr-story-down)"/></svg>
+   </div>
 
 <p>
 We aim to share this pause with you, coming to AFTR is to wind-down;

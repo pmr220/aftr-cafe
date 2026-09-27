@@ -515,3 +515,48 @@ a{color:inherit;text-decoration:none}.page{min-height:100vh}.container{width:min
     font-size:38px;
   }
 }
+
+/* Approved event filter styling; scoped to the public Events page. */
+#eventFilter {
+  gap:14px;
+  flex-wrap:wrap;
+  border-bottom:0;
+  padding-bottom:0;
+  overflow:visible;
+}
+#eventFilter button {
+  border-radius:24px;
+  padding:12px 16px;
+  min-height:44px;
+  font-size:11px;
+  letter-spacing:.06em;
+}
+@media(max-width:380px) {
+  #eventFilter { gap:10px; }
+  #eventFilter button { padding:12px; }
+}
+
+/* Homepage gallery moved from Experience; no shared gallery selectors. */
+.place-gallery{margin-top:48px}
+.place-photo-rail{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 5vw 18px;scroll-padding-inline:5vw;scrollbar-width:thin;scrollbar-color:var(--muted) var(--paper)}
+.place-photo-rail figure{flex:0 0 min(62vw,640px);margin:0;scroll-snap-align:start}
+.place-photo-rail img{display:block;width:100%;height:clamp(250px,32vw,420px);object-fit:cover;background:var(--paper)}
+.place-photo-controls{display:flex;justify-content:flex-end;gap:8px;padding:16px 5vw 0}
+.place-photo-controls button{border:1px solid var(--line);border-radius:50%;background:transparent;color:var(--ink);width:44px;height:44px;font-size:20px;cursor:pointer}
+.place-photo-controls button:disabled{opacity:.35;cursor:default}
+@media(max-width:600px){.place-photo-rail figure{flex-basis:82vw}.place-photo-rail img{height:250px}}
+
+/* Approved homepage hero; keep the video and existing action handlers. */
+.home-hero-approved .hero-copy{max-width:100%;width:100%}
+.home-hero-approved .hero-title{font-size:clamp(46px,8vw,150px);line-height:1.03;margin-right:35px}
+.home-hero-approved .hero-title em{margin-left:4vw}
+.home-hero-approved .hero-meta{display:none}
+.home-hero-approved .hero-actions{padding-right:30px}
+.home-hero-approved .scroll-cue{left:auto;right:18px;bottom:40px;transform:none}
+@media(max-width:420px){
+  .home-hero-approved .hero-title em{margin-left:0}
+  .home-hero-approved .hero-actions{gap:8px}
+  .home-hero-approved .hero-action{padding:13px 10px}
+}
+.events-load-status{font:400 12px/1.6 var(--sans);color:var(--muted);margin:12px 0}
+.events-load-status:empty{display:none}

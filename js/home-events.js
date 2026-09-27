@@ -62,91 +62,7 @@
    * Convert Google Drive URLs into browser-friendly
    * thumbnail URLs.
    */
-  const normalizeImageUrl = (value) => {
-    const url = String(value || '').trim();
-
-    if (!url) return '';
-
-    /*
-     * Base64 image
-     */
-    if (url.startsWith('data:image/')) {
-      return url;
-    }
-
-    /*
-     * Google Drive:
-     * https://drive.google.com/file/d/FILE_ID/view
-     */
-    let match = url.match(
-      /drive\.google\.com\/file\/d\/([^/]+)/i
-    );
-
-    if (match) {
-      return `https://drive.google.com/thumbnail?id=${encodeURIComponent(match[1])}&sz=w1600`;
-    }
-
-    /*
-     * Google Drive:
-     * https://drive.google.com/uc?export=view&id=FILE_ID
-     * https://drive.google.com/uc?id=FILE_ID
-     */
-    if (
-      /drive\.google\.com\/uc/i.test(url)
-    ) {
-      match = url.match(/[?&]id=([^&]+)/i);
-
-      if (match) {
-        return `https://drive.google.com/thumbnail?id=${encodeURIComponent(match[1])}&sz=w1600`;
-      }
-    }
-
-    /*
-     * Google Drive:
-     * /open?id=FILE_ID
-     */
-    if (
-      /drive\.google\.com\/open/i.test(url)
-    ) {
-      match = url.match(/[?&]id=([^&]+)/i);
-
-      if (match) {
-        return `https://drive.google.com/thumbnail?id=${encodeURIComponent(match[1])}&sz=w1600`;
-      }
-    }
-
-    /*
-     * Google Drive thumbnail URL already supplied.
-     * Keep it, but make sure a useful size is present.
-     */
-    if (
-      /drive\.google\.com\/thumbnail/i.test(url)
-    ) {
-      match = url.match(/[?&]id=([^&]+)/i);
-
-      if (match) {
-        return `https://drive.google.com/thumbnail?id=${encodeURIComponent(match[1])}&sz=w1600`;
-      }
-    }
-
-    /*
-     * Google user-content download URL
-     */
-    if (
-      /drive\.usercontent\.google\.com/i.test(url)
-    ) {
-      match = url.match(/[?&]id=([^&]+)/i);
-
-      if (match) {
-        return `https://drive.google.com/thumbnail?id=${encodeURIComponent(match[1])}&sz=w1600`;
-      }
-    }
-
-    /*
-     * Any normal image URL
-     */
-    return url;
-  };
+  const normalizeImageUrl = window.AFTR_PUBLIC_EVENTS.image;
 
   const getImage = (event) => {
     const raw = String(
@@ -291,61 +207,47 @@
     }
   };
 
-  const load = async () => {
-    let events = [];
-
-    if (API) {
-      try {
-        const response = await fetch(
-          API + '?action=events',
-          {
-            cache: 'no-store'
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            'Events request failed'
-          );
-        }
-
-        const data =
-          await response.json();
-
-        events =
-          Array.isArray(data.events)
-            ? data.events
-            : [];
-
-      } catch (error) {
-        console.error(
-          'AFTR home events error:',
-          error
-        );
-      }
-    }
-
-    events =
-      normalizeEvents(events);
-
-    empty.hidden =
-      events.length > 0;
-
-    grid.innerHTML =
-      events
-        .map(eventCard)
-        .join('');
-
-    grid.scrollLeft = 0;
-
-    grid
-      .querySelectorAll('.reveal')
-      .forEach((element) => {
-        requestAnimationFrame(() => {
-          element.classList.add('in');
-        });
-      });
+  const source = window.AFTR_PUBLIC_EVENTS;
+  const status = document.createElement('p');
+  status.className = 'events-load-status';
+  status.setAttribute('role', 'status');
+  grid.before(status);
+  let hasData = false;
+  let lastData = '';
+  let loading = false;
+  const apply = list => {
+    const signature = JSON.stringify(list) + new Date().toDateString();
+    if (signature === lastData) return;
+    lastData = signature;
+    hasData = true;
+    const events = normalizeEvents(list);
+    empty.hidden = events.length > 0;
+    const previousScroll = grid.scrollLeft;
+    grid.innerHTML = events.map(eventCard).join('');
+    grid.scrollLeft = previousScroll;
+    grid.querySelectorAll('.reveal').forEach(element => element.classList.add('in'));
   };
+  const cached = source.read();
+  if (cached) apply(cached);
+  const load = async () => {
+    if (loading || document.hidden) return;
+    loading = true;
+    status.textContent = hasData ? '' : 'Loading upcoming events…';
+    grid.setAttribute('aria-busy', 'true');
+    try {
+      apply(await source.load());
+      status.textContent = '';
+    } catch (_) {
+      if (!hasData) empty.hidden = true;
+      status.textContent = hasData
+        ? 'Showing recently loaded events. Updates are temporarily unavailable.'
+        : 'Events are taking longer to load. Retrying shortly…';
+    } finally {
+      loading = false;
+      grid.setAttribute('aria-busy', 'false');
+    }
+  };
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
 
   let hoverPaused = false;
   let touchPaused = false;
@@ -399,6 +301,6 @@
 
   window.setInterval(
     load,
-    30000
+    60000
   );
 })();

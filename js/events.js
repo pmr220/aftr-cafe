@@ -127,131 +127,7 @@
   /*
    * Google Drive image conversion.
    */
-  const normalizeImageUrl = (value) => {
-    const url =
-      String(value || '')
-        .trim();
-
-    if (!url) {
-      return '';
-    }
-
-    if (
-      url.startsWith(
-        'data:image/'
-      )
-    ) {
-      return url;
-    }
-
-    let match;
-
-    /*
-     * /file/d/FILE_ID/view
-     */
-    match =
-      url.match(
-        /drive\.google\.com\/file\/d\/([^/]+)/i
-      );
-
-    if (match) {
-      return (
-        'https://drive.google.com/thumbnail?id=' +
-        encodeURIComponent(match[1]) +
-        '&sz=w1600'
-      );
-    }
-
-    /*
-     * /uc?...id=FILE_ID
-     */
-    if (
-      /drive\.google\.com\/uc/i.test(
-        url
-      )
-    ) {
-      match =
-        url.match(
-          /[?&]id=([^&]+)/i
-        );
-
-      if (match) {
-        return (
-          'https://drive.google.com/thumbnail?id=' +
-          encodeURIComponent(match[1]) +
-          '&sz=w1600'
-        );
-      }
-    }
-
-    /*
-     * /open?id=FILE_ID
-     */
-    if (
-      /drive\.google\.com\/open/i.test(
-        url
-      )
-    ) {
-      match =
-        url.match(
-          /[?&]id=([^&]+)/i
-        );
-
-      if (match) {
-        return (
-          'https://drive.google.com/thumbnail?id=' +
-          encodeURIComponent(match[1]) +
-          '&sz=w1600'
-        );
-      }
-    }
-
-    /*
-     * Already a thumbnail URL.
-     */
-    if (
-      /drive\.google\.com\/thumbnail/i.test(
-        url
-      )
-    ) {
-      match =
-        url.match(
-          /[?&]id=([^&]+)/i
-        );
-
-      if (match) {
-        return (
-          'https://drive.google.com/thumbnail?id=' +
-          encodeURIComponent(match[1]) +
-          '&sz=w1600'
-        );
-      }
-    }
-
-    /*
-     * drive.usercontent.google.com
-     */
-    if (
-      /drive\.usercontent\.google\.com/i.test(
-        url
-      )
-    ) {
-      match =
-        url.match(
-          /[?&]id=([^&]+)/i
-        );
-
-      if (match) {
-        return (
-          'https://drive.google.com/thumbnail?id=' +
-          encodeURIComponent(match[1]) +
-          '&sz=w1600'
-        );
-      }
-    }
-
-    return url;
-  };
+  const normalizeImageUrl = window.AFTR_PUBLIC_EVENTS.image;
 
   const getImage = (event) => {
     const raw =
@@ -818,61 +694,43 @@
     );
   };
 
-  const load = async () => {
-    events = [];
-
-    if (API) {
-
-      try {
-
-        const response =
-          await fetch(
-            API + '?action=events',
-            {
-              cache: 'no-store'
-            }
-          );
-
-        if (!response.ok) {
-          throw new Error(
-            'Events request failed'
-          );
-        }
-
-        const data =
-          await response.json();
-
-        events =
-          normalizeEvents(
-            Array.isArray(
-              data.events
-            )
-              ? data.events
-              : []
-          );
-
-      } catch (error) {
-
-        console.error(
-          'AFTR public events error:',
-          error
-        );
-
-      }
-    }
-
-    const activeFilter =
-      document
-        .querySelector(
-          '#eventFilter button.active'
-        )
-        ?.dataset.filter ||
-      'all';
-
-    render(
-      activeFilter
-    );
+  const source = window.AFTR_PUBLIC_EVENTS;
+  const status = document.createElement('p');
+  status.className = 'events-load-status';
+  status.setAttribute('role', 'status');
+  grid.before(status);
+  let hasData = false;
+  let lastData = '';
+  let loading = false;
+  const apply = list => {
+    const signature = JSON.stringify(list) + new Date().toDateString();
+    if (signature === lastData) return;
+    lastData = signature;
+    hasData = true;
+    events = normalizeEvents(list);
+    render(document.querySelector('#eventFilter button.active')?.dataset.filter || 'all');
   };
+  const cached = source.read();
+  if (cached) apply(cached);
+  const load = async () => {
+    if (loading || document.hidden) return;
+    loading = true;
+    status.textContent = hasData ? '' : 'Loading upcoming events…';
+    grid.setAttribute('aria-busy', 'true');
+    try {
+      apply(await source.load());
+      status.textContent = '';
+    } catch (_) {
+      if (!hasData) empty.hidden = true;
+      status.textContent = hasData
+        ? 'Showing recently loaded events. Updates are temporarily unavailable.'
+        : 'Events are taking longer to load. Retrying shortly…';
+    } finally {
+      loading = false;
+      grid.setAttribute('aria-busy', 'false');
+    }
+  };
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
 
   document
     .querySelector(
@@ -947,6 +805,6 @@
 
   window.setInterval(
     load,
-    30000
+    60000
   );
 })();
