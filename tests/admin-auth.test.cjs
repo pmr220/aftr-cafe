@@ -106,6 +106,40 @@ test('Server rejects wrong origin, method, Google identity, issuer, audience and
   assert.equal((await request(googleToken({}, otherKey))).code, 401);
 });
 
+test('Admin read proxy rejects unauthorized calls, retries HTML once, and never forwards mutations', async () => {
+  const read = require('../api/admin-read');
+  const original = global.fetch;
+  let calls = 0;
+  async function invoke(body, origin = 'https://aftr-cafe-parth.vercel.app') {
+    const res = { headers: {}, setHeader(k,v) { this.headers[k] = v; }, status(code) { this.code = code; return this; }, json(data) { this.data = data; return this; } };
+    await read({ method: 'POST', headers: { origin }, body }, res);
+    assert.equal(res.headers['Cache-Control'], 'no-store');
+    return res;
+  }
+  try {
+    global.fetch = async (url, options) => {
+      calls++;
+      assert.equal(new URL(url).hostname, 'script.google.com');
+      assert.equal(JSON.parse(options.body).action, 'admin_requests');
+      return calls === 1 ? new Response('<!DOCTYPE html>Error') : Response.json({ ok: true, requests: [] });
+    };
+    assert.equal((await invoke({ action: 'admin_requests', adminToken: 'bad' })).code, 401);
+    assert.equal((await invoke({ action: 'approve_request', adminToken: capability() })).code, 400);
+    assert.equal((await invoke({ action: 'admin_requests', adminToken: capability() }, 'https://evil.example')).code, 403);
+    assert.equal(calls, 0);
+    assert.equal((await invoke({ action: 'admin_requests', adminToken: capability() })).data.ok, true);
+    assert.equal(calls, 2);
+    calls = 0;
+    global.fetch = async () => { calls++; return new Response('<html>Error'); };
+    assert.equal((await invoke({ action: 'admin_requests', adminToken: capability() })).code, 502);
+    assert.equal(calls, 2);
+    calls = 0;
+    global.fetch = async () => { calls++; return Response.json({ ok: false, code: 'UNAUTHORIZED' }); };
+    assert.equal((await invoke({ action: 'admin_requests', adminToken: capability() })).data.code, 'UNAUTHORIZED');
+    assert.equal(calls, 1);
+  } finally { global.fetch = original; }
+});
+
 test('Admin browser initializes without fetching private data and clears the session on sign-out', async () => {
   const elements = new Map();
   function element(selector) {
@@ -128,6 +162,7 @@ test('Admin browser initializes without fetching private data and clears the ses
       calls++;
       if (url === '/api/admin-login') return { ok: true, json: async () => ({ token: 'session', expiresAt: Date.now() + 900000 }) };
       assert.equal(JSON.parse(options.body).adminToken, 'session');
+      assert.equal(url, '/api/admin-read');
       assert.equal(options.method, 'POST');
       return { json: async () => ({ ok: true, requests: [], events: [], blocks: [], menus: [] }) };
     }

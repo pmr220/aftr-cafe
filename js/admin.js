@@ -244,11 +244,14 @@
       throw new Error('Please sign in again.');
     }
     const usedToken = adminToken;
-    const response = await fetch(API, {
+    const isRead = ['admin_requests', 'admin_events', 'admin_availability', 'menu'].includes(payload.action);
+    const response = await fetch(isRead ? '/api/admin-read' : API, {
       method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ ...payload, adminToken: usedToken })
     });
-    const data = await response.json();
+    let data;
+    try { data = await response.json(); }
+    catch { throw new Error('Backend returned an invalid response. Please try again shortly.'); }
     if (usedToken !== adminToken) throw new Error('Session ended.');
     if (!data.ok) {
       if (data.code === 'UNAUTHORIZED') signOut('Please sign in again.');
@@ -331,7 +334,7 @@
     ) {
 
       status.textContent =
-        'Backend connection error';
+        error.message || 'Backend connection error';
 
 
       console.error(
