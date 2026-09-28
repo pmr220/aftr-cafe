@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#15120f"><meta name="description" content="Book a space at AFTR for workshops, product showcases and brand promotion."><title>Book a Space — AFTR</title><link rel="stylesheet" href="css/style.css"></head><body><div class="progress"></div><div class="cursor"></div>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#15120f"><meta name="description" content="Book a space at AFTR for workshops, product showcases and brand promotion."><title>Book a Space — AFTR</title><link rel="stylesheet" href="css/style.css"><style>#spaceForm [hidden]{display:none!important}</style></head><body><div class="progress"></div><div class="cursor"></div>
 
 <nav class="nav"><a class="brand" href="index.html">;AFTR<span>ALL DAY CAFE</span></a><div></div><div class="navlinks"><a href="index.html">Home</a><a href="events.html">Events</a><a href="book.html">Book a Space</a><a href="partner.html">Partner With Us</a><a href="experience.html">Experience</a><a href="about.html">What is AFTR</a><a href="contact.html">Contact</a></div><button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false"><span></span><span></span><span></span></button></nav>
 
@@ -81,12 +81,12 @@ Choose a date and time to check the latest availability.
 
 <div class="field light">
 <input id="sTitle" required placeholder=" ">
-<label>Activity / event name</label>
+<label id="spaceTitleLabel">Activity / workshop name</label>
 </div>
 
 <div class="field light">
 <input id="sOrg" required placeholder=" ">
-<label>Your name / brand</label>
+<label>Your name</label>
 </div>
 
 <div class="field light">
@@ -99,24 +99,29 @@ Choose a date and time to check the latest availability.
 <label>Email</label>
 </div>
 
-<div class="field light">
+<div class="field light" id="spacePriceField">
 <input id="sPrice" placeholder=" ">
 <label>Pricing / entry</label>
 </div>
 
-<div class="field light">
+<div class="field light" id="spaceGuestsField">
 <input id="sGuests" type="number" min="1" max="300" placeholder=" ">
 <label>Expected guests</label>
 </div>
 
+<div class="field light" id="spaceDaysField" hidden>
+<input id="sDays" type="number" min="1" step="1" placeholder=" " disabled>
+<label>Number of days</label>
+</div>
+
 <div class="field light full">
-<textarea id="sAbout" rows="5" required placeholder=" "></textarea>
+<textarea id="sAbout" rows="5" placeholder=" "></textarea>
 <label>Tell us about the activity</label>
 </div>
 
 <div class="field light full">
-<input id="sImage" type="file" accept="image/*" multiple>
-<label class="file-label">Poster / event photos (up to 4)</label>
+<input id="sImage" type="file" accept="image/*">
+<label class="file-label">Poster / activity photo (one image, optional)</label>
 </div>
 
 </div>

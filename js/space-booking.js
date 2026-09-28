@@ -280,6 +280,24 @@
     return true;
   }
 
+  const isWorkshop = () => selectedType() === 'Workshop';
+  function updateTypeFields() {
+    const workshop = isWorkshop();
+    document.querySelector('#spaceTitleLabel').textContent = workshop
+      ? 'Activity / workshop name'
+      : selectedType() === 'Product Showcase' ? 'Product / showcase name' : 'Brand / campaign name';
+    for (const [wrapper, input, show] of [
+      ['#spacePriceField', '#sPrice', workshop],
+      ['#spaceGuestsField', '#sGuests', workshop],
+      ['#spaceDaysField', '#sDays', !workshop]
+    ]) {
+      document.querySelector(wrapper).hidden = !show;
+      document.querySelector(input).disabled = !show;
+    }
+  }
+  updateTypeFields();
+  form.addEventListener('reset', () => setTimeout(updateTypeFields, 0));
+
   types.forEach(
     (button) => {
       button.addEventListener(
@@ -303,6 +321,7 @@
               button.dataset.type ||
               'Workshop';
           }
+          updateTypeFields();
         }
       );
     }
@@ -340,7 +359,7 @@
         ...input.files
       ].slice(
         0,
-        4
+        1
       );
 
     return Promise.all(
@@ -475,6 +494,8 @@
             ?.value.trim() ||
           '',
 
+        name: document.querySelector('#sOrg')?.value.trim() || '',
+
         organizer:
           document
             .querySelector(
@@ -500,7 +521,7 @@
           '',
 
         guests:
-          document
+          !isWorkshop() ? '' : document
             .querySelector(
               '#sGuests'
             )
@@ -517,20 +538,18 @@
           end.value,
 
         price:
-          document
+          !isWorkshop() ? '' : document
             .querySelector(
               '#sPrice'
             )
             ?.value.trim() ||
           '',
 
-        about:
-          document
-            .querySelector(
-              '#sAbout'
-            )
-            ?.value.trim() ||
-          '',
+        about: [
+          !isWorkshop() && document.querySelector('#sDays').value
+            ? 'Number of days (information only): ' + document.querySelector('#sDays').value : '',
+          document.querySelector('#sAbout')?.value.trim() || ''
+        ].filter(Boolean).join('\n\n'),
 
         images:
           await photosFromInput(),
