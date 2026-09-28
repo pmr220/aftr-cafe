@@ -1,10 +1,12 @@
 (() => {
   const key = 'aftr-public-events-v1';
   let pending;
+  // Only public event information is stored here, never booking/admin records.
+  const storage = () => typeof localStorage !== 'undefined' ? localStorage : sessionStorage;
   const read = () => {
     try {
-      const saved = JSON.parse(sessionStorage.getItem(key));
-      if (saved && Date.now() - saved.at < 180000 && Array.isArray(saved.events)) return saved.events;
+      const saved = JSON.parse(storage().getItem(key));
+      if (saved && Number.isFinite(saved.at) && saved.at <= Date.now() && Date.now() - saved.at < 900000 && Array.isArray(saved.events)) return saved.events;
     } catch (_) {}
     return null;
   };
@@ -16,7 +18,9 @@
           if (!response.ok) throw new Error('Events unavailable');
           const data = await response.json();
           if (!data.ok || !Array.isArray(data.events)) throw new Error('Invalid events');
-          try { sessionStorage.setItem(key, JSON.stringify({ at: Date.now(), events: data.events })); } catch (_) {}
+          // Preserve upstream age: reading a cached response must not make old
+          // event information look newly fetched from Google.
+          try { storage().setItem(key, JSON.stringify({ at: Number.isFinite(data.fetchedAt) ? data.fetchedAt : Date.now(), events: data.events })); } catch (_) {}
           return data.events;
         }).finally(() => { pending = null; });
       return pending;

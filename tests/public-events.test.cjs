@@ -45,7 +45,7 @@ test('Browser shares public events, expires cache and normalizes all Drive image
   assert.equal(source.read(),null);
   await Promise.all([source.load(),source.load()]);assert.equal(requests,1);
   assert.equal(source.read()[0].title,'Event');
-  storage.set('aftr-public-events-v1',JSON.stringify({at:Date.now()-180001,events:[]}));assert.equal(source.read(),null);
+  storage.set('aftr-public-events-v1',JSON.stringify({at:Date.now()-900001,events:[]}));assert.equal(source.read(),null);
   for(const url of ['https://drive.google.com/file/d/abcdefghijk123/view','https://drive.google.com/uc?export=view&id=abcdefghijk123','https://drive.google.com/thumbnail?id=abcdefghijk123&sz=w1600']) assert.equal(source.image(url),'/api/event-image?id=abcdefghijk123');
   assert.equal(source.image('javascript:alert(1)'),'');
 });

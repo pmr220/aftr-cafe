@@ -10,8 +10,10 @@ module.exports = async (req, res) => {
     const data = await response.json();
     if (data.ok !== true || !Array.isArray(data.events)) throw new Error('Invalid feed');
     res.setHeader('Cache-Control', 'public, max-age=15');
-    res.setHeader('Vercel-CDN-Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
-    return res.status(200).json({ ok: true, events: data.events });
+    // Keep a successful response through quiet periods. Refresh in the background
+    // after one minute instead of making the next visitor wait for Apps Script.
+    res.setHeader('Vercel-CDN-Cache-Control', 'public, s-maxage=60, stale-while-revalidate=3600');
+    return res.status(200).json({ ok: true, events: data.events, fetchedAt: Date.now() });
   } catch {
     return res.status(502).json({ ok: false, error: 'Events are temporarily unavailable. Please try again.' });
   }
