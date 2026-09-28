@@ -8,6 +8,7 @@ const handler = require('../api/admin-login');
 const secret = crypto.randomBytes(32).toString('base64');
 const audience = 'test.apps.googleusercontent.com';
 const email = 'admin@gmail.com';
+delete process.env.AFTR_ADMIN_EMAILS;
 Object.assign(process.env, { AFTR_ADMIN_SIGNING_SECRET: secret, AFTR_GOOGLE_CLIENT_ID: audience, AFTR_ADMIN_EMAIL: email });
 const properties = { AFTR_ADMIN_SIGNING_SECRET: secret, AFTR_GOOGLE_CLIENT_ID: audience, AFTR_ADMIN_EMAIL: email };
 const ctx = vm.createContext({
@@ -68,6 +69,34 @@ test('Real Google library verifies signed fixture; server token is accepted by A
   const res = await request(googleToken());
   assert.equal(res.code, 200);
   assert.equal(ctx.verifyAdminToken_(res.body.token), true);
+});
+
+test('Both services enforce the same multiple-admin list and revoke removed accounts', async () => {
+  const allowed = ['parthrathi7@gmail.com', 'aftrcafe@gmail.com', 'aabhish49@gmail.com'];
+  process.env.AFTR_ADMIN_EMAILS = properties.AFTR_ADMIN_EMAILS = ' ' + allowed.join(', ').toUpperCase() + ', ';
+  try {
+    for (const admin of allowed) {
+      const res = await request(googleToken({ email: admin }));
+      assert.equal(res.code, 200);
+      assert.equal(ctx.verifyAdminToken_(res.body.token), true);
+    }
+    for (const outsider of [email, 'other@gmail.com', 'xaftrcafe@gmail.com']) {
+      assert.equal((await request(googleToken({ email: outsider }))).code, 403);
+      assert.equal(ctx.verifyAdminToken_(capability({ email: outsider })), false);
+    }
+    const oldToken = (await request(googleToken({ email: allowed[0] }))).body.token;
+    process.env.AFTR_ADMIN_EMAILS = properties.AFTR_ADMIN_EMAILS = allowed[1];
+    assert.equal(ctx.verifyAdminToken_(oldToken), false);
+    assert.equal((await request(googleToken({ email: allowed[0] }))).code, 403);
+    process.env.AFTR_ADMIN_EMAILS = properties.AFTR_ADMIN_EMAILS = ' , ';
+    assert.equal((await request(googleToken())).code, 503);
+    assert.equal(ctx.verifyAdminToken_(capability()), false);
+  } finally {
+    delete process.env.AFTR_ADMIN_EMAILS;
+    delete properties.AFTR_ADMIN_EMAILS;
+  }
+  assert.equal((await request(googleToken())).code, 200);
+  assert.equal(ctx.verifyAdminToken_(capability()), true);
 });
 test('Server rejects wrong origin, method, Google identity, issuer, audience and signature', async () => {
   assert.equal((await request(googleToken(), { headers: { origin: 'https://evil.example', 'content-type': 'application/json' } })).code, 403);

@@ -4799,9 +4799,11 @@ function verifyAdminToken_(token) {
     if (parts.length !== 2 || !/^[A-Za-z0-9_-]+$/.test(parts[0]) || !/^[A-Za-z0-9_-]{43}$/.test(parts[1])) return false;
     const properties = PropertiesService.getScriptProperties();
     const secret = properties.getProperty('AFTR_ADMIN_SIGNING_SECRET');
-    const email = properties.getProperty('AFTR_ADMIN_EMAIL');
+    const configuredEmails = properties.getProperty('AFTR_ADMIN_EMAILS');
+    const emails = (configuredEmails != null ? configuredEmails : (properties.getProperty('AFTR_ADMIN_EMAIL') || ''))
+      .split(',').map(email => email.trim().toLowerCase()).filter(Boolean);
     const audience = properties.getProperty('AFTR_GOOGLE_CLIENT_ID');
-    if (!secret || secret.length < 40 || !email || !audience) return false;
+    if (!secret || secret.length < 40 || !emails.length || !audience) return false;
     const expected = Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(parts[0], secret)).replace(/=+$/, '');
     let mismatch = expected.length ^ parts[1].length;
     for (let i = 0; i < expected.length; i++) mismatch |= expected.charCodeAt(i) ^ parts[1].charCodeAt(i);
@@ -4810,7 +4812,7 @@ function verifyAdminToken_(token) {
     const now = Math.floor(Date.now() / 1000);
     return claims.iss === 'aftr-admin' && claims.aud === audience &&
       typeof claims.sub === 'string' && claims.sub.length > 0 &&
-      claims.email === email.trim().toLowerCase() &&
+      emails.includes(claims.email) &&
       Number.isFinite(claims.iat) && Number.isFinite(claims.exp) &&
       claims.iat <= now + 30 && claims.exp > now &&
       claims.exp > claims.iat && claims.exp - claims.iat <= 900;

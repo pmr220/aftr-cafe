@@ -1,5 +1,30 @@
 # Deploy admin Google sign-in
 
+## Multiple administrators
+
+Set AFTR_ADMIN_EMAILS in both Vercel Production environment variables and the
+original AFTR Apps Script project's Script Properties to this comma-separated value:
+
+```
+parthrathi7@gmail.com,aftrcafe@gmail.com,aabhish49@gmail.com
+```
+
+Deploy the updated Code.gs as a new version of the existing Apps Script deployment.
+Commit and push the updated API code after setting the Vercel variable, so the new
+deployment receives it. Each account owner signs in using their own Google account.
+Verify each can access the dashboard and an unlisted account is rejected.
+
+AFTR_ADMIN_EMAILS takes precedence over AFTR_ADMIN_EMAIL; the old singular setting
+is supported when the plural setting is absent. An empty plural list denies access.
+Use exact email addresses separated by commas. All listed accounts have full admin
+permissions. Removing an address from the Apps Script list rejects its existing
+tokens; also update Vercel and redeploy to stop issuing tokens for that address.
+
+This changes admin access only. TEAM_EMAIL, resource ownership, the OAuth client,
+and signing secret stay unchanged. Client ownership migration is a separate task.
+
+## Initial deployment
+
 Local tests cover authentication and routing with simulated Apps Script services.
 Real Google sign-in, deployed Apps Script permissions, and uploads still need live checks.
 

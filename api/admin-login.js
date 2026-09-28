@@ -14,9 +14,10 @@ module.exports = async function handler(req, res) {
     return res.status(403).json({ error: 'Request not allowed.' });
   }
   const audience = process.env.AFTR_GOOGLE_CLIENT_ID;
-  const email = process.env.AFTR_ADMIN_EMAIL;
+  const emails = (process.env.AFTR_ADMIN_EMAILS ?? process.env.AFTR_ADMIN_EMAIL ?? '')
+    .split(',').map(email => email.trim().toLowerCase()).filter(Boolean);
   const secret = process.env.AFTR_ADMIN_SIGNING_SECRET;
-  if (!audience || !email || !secret || secret.length < 40) {
+  if (!audience || !emails.length || !secret || secret.length < 40) {
     return res.status(503).json({ error: 'Admin sign-in is not configured.' });
   }
   try {
@@ -28,7 +29,7 @@ module.exports = async function handler(req, res) {
     const identity = ticket.getPayload();
     const now = Math.floor(Date.now() / 1000);
     if (!identity || identity.email_verified !== true || !identity.sub ||
-        identity.email?.toLowerCase() !== email.trim().toLowerCase() ||
+        typeof identity.email !== 'string' || !emails.includes(identity.email.toLowerCase()) ||
         !Number.isFinite(identity.exp) || identity.exp <= now) {
       return res.status(403).json({ error: 'This Google account does not have admin access.' });
     }
