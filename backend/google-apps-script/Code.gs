@@ -3722,14 +3722,16 @@ function sendApprovalEmail_(
 
   const body =
 
-    'Hi ' +
+    'Hello ' +
     (
       request.name ||
-      ''
+      'there'
     ) +
     ',\n\n' +
 
-    'Your AFTR request has been approved.\n\n' +
+    'Thank you for choosing AFTR. We are pleased to confirm that your request has been approved.\n\n' +
+
+    'YOUR BOOKING DETAILS\n' +
 
     'Type: ' +
     (
@@ -3756,20 +3758,14 @@ function sendApprovalEmail_(
       request.endTime
     ) +
 
-    '\n\n' +
+    ' (IST)' +
 
-    (
-      isPublic
+    (request.title ? '\nBooking: ' + request.title : '') +
+    (request.requestId ? '\nReference: ' + request.requestId : '') +
 
-        ? 'Your event has also been published on the AFTR Home page and Events page.'
-
-        : 'This request is private and is not published on the website.'
-
-    ) +
-
-    '\n\nIt has been added to the AFTR Google Calendar.' +
-
-    '\n\nAFTR — All Day Cafe';
+    '\n\nIf you need to make any changes, please contact the AFTR team before your scheduled visit.' +
+    '\n\nWe look forward to welcoming you.' +
+    '\n\nWarm regards,\nTeam AFTR\nAll Day Cafe';
 
 
   try {
@@ -3778,9 +3774,7 @@ function sendApprovalEmail_(
 
       request.email,
 
-      isPublic
-        ? 'AFTR — Event approved and published'
-        : 'AFTR — Request approved',
+      'AFTR — Your booking request is approved',
 
       body
 
