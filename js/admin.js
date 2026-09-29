@@ -269,82 +269,27 @@
      ======================================================= */
 
   async function refreshAll() {
-
-    const status =
-      document.querySelector(
-        '#apiStatus'
-      );
-
-
-    try {
-
-      const [
-        requestData,
-        eventData,
-        calendarData,
-        menuData
-      ] =
-        await Promise.all([
-
-          get(
-            'admin_requests'
-          ),
-
-          get(
-            'admin_events'
-          ),
-
-          get(
-            'availability'
-          ),
-
-          get(
-            'menu'
-          )
-
-        ]);
-
-
-      requests =
-        requestData.requests ||
-        [];
-
-      events =
-        eventData.events ||
-        [];
-
-      calendarEntries =
-        calendarData.blocks ||
-        [];
-
-      menus =
-        menuData.menus ||
-        [];
-
-
-      status.textContent =
-        'Live backend connected';
-
-
+    const status = document.querySelector('#apiStatus');
+    const session = adminToken;
+    status.textContent = 'Loading dashboard…';
+    const sections = [
+      ['Requests', 'admin_requests', data => { requests = data.requests || []; }],
+      ['Events', 'admin_events', data => { events = data.events || []; }],
+      ['Calendar', 'availability', data => { calendarEntries = data.blocks || []; }],
+      ['Menus', 'menu', data => { menus = data.menus || []; }]
+    ];
+    const results = await Promise.allSettled(sections.map(async ([name, action, apply]) => {
+      const data = await get(action);
+      if (!session || adminToken !== session) return;
+      apply(data);
       renderAll();
-
-
-    } catch (
-      error
-    ) {
-
-      status.textContent =
-        error.message || 'Backend connection error';
-
-
-      console.error(
-        error
-      );
-
-    }
-
+    }));
+    if (!session || adminToken !== session) return;
+    const failed = sections.filter((_, index) => results[index].status === 'rejected').map(section => section[0]);
+    status.textContent = failed.length
+      ? 'Could not refresh: ' + failed.join(', ') + '. These sections may be empty or out of date. Please try signing in again shortly.'
+      : 'Live backend connected';
   }
-
 
   /* =======================================================
      OVERVIEW

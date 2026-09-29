@@ -152,6 +152,7 @@ test('Admin browser initializes without fetching private data and clears the ses
     return elements.get(selector);
   }
   let config;
+  let failMenus = false;
   let calls = 0;
   const google = { accounts: { id: { initialize(value) { config = value; }, renderButton() {}, disableAutoSelect() {} } } };
   const browser = vm.createContext({
@@ -164,6 +165,7 @@ test('Admin browser initializes without fetching private data and clears the ses
       assert.equal(JSON.parse(options.body).adminToken, 'session');
       assert.equal(url, '/api/admin-read');
       assert.equal(options.method, 'POST');
+      if (failMenus && JSON.parse(options.body).action === 'menu') throw new Error('Network unavailable');
       return { json: async () => ({ ok: true, requests: [], events: [], blocks: [], menus: [] }) };
     }
   });
@@ -172,6 +174,11 @@ test('Admin browser initializes without fetching private data and clears the ses
   browser.window.aftrInitGoogleLogin();
   await config.callback({ credential: 'fixture' });
   assert.equal(calls, 5);
+  assert.equal(element('#dashboard').hidden, false);
+  assert.equal(element('#apiStatus').textContent, 'Live backend connected');
+  failMenus = true;
+  await config.callback({ credential: 'fixture' });
+  assert.match(element('#apiStatus').textContent, /Could not refresh: Menus\./);
   assert.equal(element('#dashboard').hidden, false);
   element('#adminSignOut').listeners.click();
   assert.equal(element('#dashboard').hidden, true);

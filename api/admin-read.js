@@ -31,17 +31,28 @@ module.exports = async (req, res) => {
   }
   // Only reads may be retried. Never replay uploads or approval actions.
   for (let attempt = 0; attempt < 2; attempt++) {
+    const started = Date.now();
+    let failure = 'network';
+    let upstreamStatus = null;
     try {
       const response = await fetch(API, {
         method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: body.action, adminToken: body.adminToken }),
-        signal: AbortSignal.timeout(12000)
+        signal: AbortSignal.timeout(25000)
       });
+      upstreamStatus = response.status;
+      failure = 'http';
       if (!response.ok) throw Error();
+      failure = 'invalid_json';
       const data = await response.json();
+      failure = 'invalid_shape';
       if (!data || typeof data.ok !== 'boolean') throw Error();
       return res.status(200).json(data);
-    } catch {}
+    } catch (error) {
+      console.warn('admin_read_failed', JSON.stringify({ action: body.action, attempt: attempt + 1,
+        reason: error.name === 'TimeoutError' || error.name === 'AbortError' ? 'timeout' : failure,
+        upstreamStatus, elapsedMs: Date.now() - started }));
+    }
   }
   return res.status(502).json({ ok: false, error: 'Google backend is temporarily unavailable. Please try again shortly.' });
 };
