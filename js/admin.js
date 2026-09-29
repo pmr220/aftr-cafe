@@ -1743,6 +1743,10 @@
 
     list.innerHTML =
       calendarEntries
+        .slice()
+        .sort((a, b) =>
+          `${b.date || ''} ${b.start || ''}`.localeCompare(`${a.date || ''} ${a.start || ''}`)
+        )
         .map(
           block => `
 
