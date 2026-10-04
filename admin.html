@@ -240,7 +240,7 @@ AFTR Admin — Control Room
 
 </style>
 
-</head>
+<link rel="stylesheet" href="css/instagram.css"></head>
 
 <body class="admin-body">
 
@@ -389,11 +389,22 @@ Calendar & Availability
   data-tab="menu"
 >
 Menu PDFs
-</button>
+</button><button class="admin-tab" data-tab="instagram">Instagram Posts</button>
 
 </div>
 
 
+<section id="adminTab-instagram" class="dash-panel" hidden>
+<div class="eyebrow">Instagram Posts</div><h2>Moments at AFTR</h2>
+<p>Add a cover photo and a link to the original Instagram post or reel.</p>
+<form id="instagramForm" class="ig-admin-form">
+<label>Instagram post or reel URL<input name="url" type="url" required placeholder="https://www.instagram.com/p/..."></label>
+<label>Cover photo (JPG, PNG or WebP, up to 2 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp" required></label>
+<label>Caption (optional)<textarea name="caption" maxlength="300" rows="3"></textarea></label>
+<button type="submit" class="premium-submit">Save / Publish post ↗</button><button type="reset">Clear form / Cancel edit</button>
+</form><p id="instagramStatus" class="ig-admin-status" role="status"></p>
+<div id="instagramAdminList" class="admin-list"></div>
+</section>
 <!-- =====================================================
      OVERVIEW
      ===================================================== -->
@@ -830,7 +841,7 @@ Upload menu PDF
 
 <script src="js/config.js"></script>
 <script src="js/main.js"></script>
-<script src="js/admin.js"></script>
+<script src="js/instagram.js"></script><script src="js/admin.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer onload="window.aftrInitGoogleLogin()" onerror="document.getElementById('loginError').textContent='Google sign-in could not load. Please refresh.'"></script>
 
 </body>

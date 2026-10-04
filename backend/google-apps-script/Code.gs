@@ -1230,6 +1230,7 @@ function readAction_(
         : '';
 
 
+    if (action === 'instagram_posts') return instagramList_();
     if (['admin_requests', 'admin_events'].indexOf(action) !== -1 && !isAdmin) {
       return unauthorized_();
     }
@@ -1854,6 +1855,8 @@ function doPost(
     const publicActions = ['submit_event', 'booking', 'collaboration'];
     if (publicActions.indexOf(data.action) === -1) {
       if (!verifyAdminToken_(data.adminToken)) return unauthorized_();
+      if (data.action === 'save_instagram_post') return instagramSave_(data);
+      if (data.action === 'delete_instagram_post') return instagramDelete_(data);
       if (['admin_requests', 'admin_events', 'admin_availability', 'menu'].indexOf(data.action) !== -1) {
         return readAction_({ parameter: { action: data.action === 'admin_availability' ? 'availability' : data.action } }, true);
       }

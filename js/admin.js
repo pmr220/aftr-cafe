@@ -28,6 +28,7 @@
   let events = [];
   let calendarEntries = [];
   let menus = [];
+  const instagramAdmin = window.aftrInstagramAdmin?.(post);
 
   let requestFilter =
     'all';
@@ -126,6 +127,7 @@
     dashboard.hidden = true;
     login.hidden = false;
     requests = []; events = []; calendarEntries = []; menus = [];
+    instagramAdmin?.reset();
     closeModal();
     renderAll();
     document.querySelector('#loginError').textContent = message;
@@ -221,6 +223,7 @@
             false;
 
 
+        if (event.target.dataset.tab === 'instagram') instagramAdmin?.load();
         if (
           event.target.dataset.tab ===
           'menu'

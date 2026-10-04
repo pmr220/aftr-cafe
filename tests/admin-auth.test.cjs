@@ -37,7 +37,7 @@ test('Apps Script validates signatures, identity, lifetime and configuration', (
   properties.AFTR_ADMIN_SIGNING_SECRET = secret;
 });
 test('Every private action rejects unauthenticated POST, and private GET is blocked', () => {
-  for (const action of ['admin_requests', 'admin_events', 'admin_availability', 'update_request', 'approve_request', 'reject_request', 'save_event', 'unpublish_event', 'block_slot', 'save_menu_pdf', 'delete_menu_pdf', 'menu', 'unknown']) {
+  for (const action of ['admin_requests', 'admin_events', 'admin_availability', 'update_request', 'approve_request', 'reject_request', 'save_event', 'unpublish_event', 'block_slot', 'save_menu_pdf', 'delete_menu_pdf', 'save_instagram_post', 'delete_instagram_post', 'menu', 'unknown']) {
     assert.equal(ctx.doPost({ postData: { contents: JSON.stringify({ action }) } }).code, 'UNAUTHORIZED');
   }
   for (const action of ['admin_requests', 'admin_events']) assert.equal(ctx.doGet({ parameter: { action } }).code, 'UNAUTHORIZED');
