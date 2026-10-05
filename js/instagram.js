@@ -3,7 +3,7 @@
   const esc = value => String(value || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function cards(posts) {
     return posts.filter(p => validUrl(p.url) && /^[A-Za-z0-9_-]{10,150}$/.test(p.imageId)).map(p =>
-      `<a class="ig-card" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer"><span class="ig-card-heading">;AFTR <small>Instagram ↗</small></span><img loading="lazy" decoding="async" src="/api/event-image?id=${encodeURIComponent(p.imageId)}" alt="${esc(p.caption || 'A moment at AFTR')}"><span class="ig-card-caption">${esc(p.caption || 'A moment at AFTR')}<small>View on Instagram ↗</small></span></a>`).join('');
+      `<a class="ig-card" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer"><span class="ig-card-heading"><span class="aftr-wordmark">;AFTR</span> <small>Instagram ↗</small></span><img loading="lazy" decoding="async" src="/api/event-image?id=${encodeURIComponent(p.imageId)}" alt="${esc(p.caption || 'A moment at AFTR')}"><span class="ig-card-caption">${esc(p.caption || 'A moment at AFTR')}<small>View on Instagram ↗</small></span></a>`).join('');
   }
   const section = document.querySelector('#instagramSection');
   if (section) fetch('/api/instagram').then(r => r.json()).then(data => {
