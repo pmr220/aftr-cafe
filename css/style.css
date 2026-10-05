@@ -565,4 +565,9 @@ a{color:inherit;text-decoration:none}.page{min-height:100vh}.container{width:min
 .aftr-wordmark,.footer-logo,.about-hero-brand{font-family:var(--sans);font-weight:500;font-style:normal;letter-spacing:.02em;white-space:nowrap}
 .footer-legal{margin-top:24px;margin-bottom:0;font:400 11px/1.8 var(--sans);letter-spacing:0;color:#aaa092;text-transform:none}
 .about-hero-line{white-space:nowrap;font-size:clamp(26px,7.8vw,108px);line-height:1.2}
-.about-official-logo{display:block;width:clamp(125px,24vw,190px);height:auto;aspect-ratio:1;object-fit:contain;border-radius:50%}
+.about-official-logo{display:block;width:clamp(180px,46vw,240px);height:auto;aspect-ratio:1;object-fit:contain;border-radius:50%}
+
+/* Small spacing adjustments for inner-page headings only. */
+.page-hero h1,.contact-page h1{line-height:1.04;letter-spacing:-.035em;word-spacing:.035em}
+.partner-choice{padding-top:28px}
+@media(max-width:800px){.partner-choice{padding-top:22px}}
