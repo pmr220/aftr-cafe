@@ -78,7 +78,7 @@
 
 
     const response =
-      await fetch(
+      await window.AFTRSubmission.send(
         API,
         {
 
@@ -258,7 +258,7 @@
 
     collaborationForm.addEventListener(
       'submit',
-      async event => {
+      window.AFTRSubmission.wrap(collaborationForm, async event => {
 
         event.preventDefault();
 
@@ -349,6 +349,7 @@
           );
 
 
+          window.AFTRSubmission.complete(collaborationForm);
           collaborationForm.reset();
 
 
@@ -367,7 +368,7 @@
 
         }
 
-      }
+      })
     );
 
   }
@@ -389,7 +390,7 @@
 
     eventForm.addEventListener(
       'submit',
-      async event => {
+      window.AFTRSubmission.wrap(eventForm, async event => {
 
         event.preventDefault();
 
@@ -501,6 +502,7 @@
           );
 
 
+          window.AFTRSubmission.complete(eventForm);
           eventForm.reset();
 
 
@@ -519,7 +521,7 @@
 
         }
 
-      }
+      })
     );
 
   }

@@ -452,9 +452,7 @@
 
   form.addEventListener(
     'submit',
-    async (
-      event
-    ) => {
+    window.AFTRSubmission.wrap(form, async (event) => {
       event.preventDefault();
 
       if (!check()) {
@@ -571,7 +569,7 @@
 
       try {
         const response =
-          await fetch(
+          await window.AFTRSubmission.send(
             API,
             {
               method:
@@ -603,6 +601,7 @@
           `${requestType} request sent to AFTR. After approval, only public event types are published on Home and Events.`
         );
 
+        window.AFTRSubmission.complete(form);
         form.reset();
 
         if (
@@ -629,6 +628,6 @@
           error.message
         );
       }
-    }
+    })
   );
 })();

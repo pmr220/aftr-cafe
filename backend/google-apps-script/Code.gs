@@ -1853,6 +1853,9 @@ function doPost(
 
 
     const publicActions = ['submit_event', 'booking', 'collaboration'];
+    if (publicActions.indexOf(data.action) !== -1 && data.requestId) {
+      return submitOnce_(data);
+    }
     if (publicActions.indexOf(data.action) === -1) {
       if (!verifyAdminToken_(data.adminToken)) return unauthorized_();
       if (data.action === 'save_instagram_post') return instagramSave_(data);
@@ -3737,15 +3740,10 @@ function sendApprovalEmail_(
     'YOUR BOOKING DETAILS\n' +
 
     'Type: ' +
-    (
-      request.requestGroup ||
-      ''
-    ) +
-    ' — ' +
-    (
-      request.requestType ||
-      ''
-    ) +
+    (request.requestType === 'Reserve a Table' ? 'Table Reservation' :
+      [request.requestGroup, request.requestType].filter(Boolean).join(' — ')) +
+
+    (request.requestType === 'Reserve a Table' && request.guests ? '\nNumber of guests: ' + request.guests : '') +
 
     '\nDate: ' +
     (
@@ -4814,4 +4812,17 @@ function verifyAdminToken_(token) {
       claims.iat <= now + 30 && claims.exp > now &&
       claims.exp > claims.iat && claims.exp - claims.iat <= 900;
   } catch (_) { return false; }
+}
+
+// Serialize retried public submissions so the same browser request creates one row/email.
+function submitOnce_(data) {
+  if (!/^REQ-[A-Za-z0-9-]{10,80}$/.test(String(data.requestId))) throw new Error('Invalid request reference.');
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) throw new Error('The cafe is receiving requests. Please try again shortly.');
+  try {
+    if (findRequest_(data.requestId)) return json_({ ok: true, requestId: data.requestId });
+    if (data.action === 'booking') return submitTable_(data);
+    if (data.action === 'collaboration') return submitCollaboration_(data);
+    return submitEvent_(data);
+  } finally { lock.releaseLock(); }
 }

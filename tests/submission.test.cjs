@@ -1,0 +1,38 @@
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const vm=require('node:vm');
+const fs=require('node:fs');
+const {webcrypto}=require('node:crypto');
+test('Rapid clicks run once; success hides form; uncertain retries keep the same reference',async()=>{
+ const storage=new Map(),bodies=[];
+ const ctx=vm.createContext({window:{},TextEncoder,crypto:webcrypto,sessionStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},fetch:async(url,options)=>{bodies.push(JSON.parse(options.body));return {};},document:{createElement:()=>({setAttribute(){},focus(){}})}});
+ vm.runInContext(fs.readFileSync('js/submission.js','utf8'),ctx);
+ const button={disabled:false,innerHTML:'Send',tagName:'BUTTON'};
+ const form={querySelectorAll:()=>[button],setAttribute(){},removeAttribute(){},after(panel){this.panel=panel;}};
+ const api=ctx.window.AFTRSubmission;
+ let release,calls=0;const wait=new Promise(resolve=>{release=resolve;});
+ const submit=api.wrap(form,async()=>{calls++;await wait;api.complete(form);});
+ const first=submit({preventDefault(){}});await submit({preventDefault(){}});
+ assert.equal(calls,1);assert.equal(button.disabled,true);assert.equal(button.textContent,'Sending…');assert.notEqual(form.hidden,true);
+ release();await first;assert.equal(form.hidden,true);assert.match(form.panel.innerHTML,/Request sent/);
+ await submit({preventDefault(){}});assert.equal(calls,1);
+ const options={body:JSON.stringify({action:'booking',name:'Person'})};
+ await api.send('backend',options);await api.send('backend',options);
+ assert.equal(bodies[0].requestId,bodies[1].requestId);
+ await api.send('backend',{body:JSON.stringify({action:'booking',name:'Different'})});assert.notEqual(bodies[0].requestId,bodies[2].requestId);
+ const retryForm={...form,hidden:false},retryButton={...button,disabled:false};retryForm.querySelectorAll=()=>[retryButton];
+ await api.wrap(retryForm,async()=>{})({preventDefault(){}});assert.equal(retryButton.disabled,false);
+});
+test('Backend retry creates one request/email and approval includes table guests',()=>{
+ let submissions=0,releases=0,existing=false,mail;
+ const ctx=vm.createContext({console,LockService:{getScriptLock:()=>({tryLock:()=>true,releaseLock:()=>releases++})},MailApp:{sendEmail:(...args)=>{mail=args;}}});
+ vm.runInContext(fs.readFileSync('backend/google-apps-script/Code.gs','utf8'),ctx);
+ ctx.json_=v=>v;ctx.findRequest_=()=>existing?{}:null;
+ ctx.submitTable_=()=>{submissions++;existing=true;return {ok:true};};
+ const data={action:'booking',requestId:'REQ-abcdefghij123456'};
+ assert.equal(ctx.submitOnce_(data).ok,true);assert.equal(ctx.submitOnce_(data).ok,true);
+ assert.equal(submissions,1);assert.equal(releases,2);
+ ctx.normalizeDate_=()=> '2026-10-10';ctx.timeDisplay_=()=> '12:00 PM — 1:00 PM';
+ ctx.sendApprovalEmail_({email:'test@example.com',name:'Guest',requestGroup:'Table Reservations',requestType:'Reserve a Table',guests:6},false);
+ assert.match(mail[2],/Type: Table Reservation\nNumber of guests: 6/);assert.doesNotMatch(mail[2],/Reserve a Table/);
+});
