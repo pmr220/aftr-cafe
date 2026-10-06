@@ -1853,11 +1853,24 @@ function doPost(
 
 
     const publicActions = ['submit_event', 'booking', 'collaboration'];
+    if (data.action === 'submission_receipt') {
+      if (!/^REQ-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(data.requestId))) throw new Error('Invalid reference.');
+      return json_({ ok: true, received: !!findRequest_(data.requestId) });
+    }
     if (publicActions.indexOf(data.action) !== -1 && data.requestId) {
       return submitOnce_(data);
     }
     if (publicActions.indexOf(data.action) === -1) {
       if (!verifyAdminToken_(data.adminToken)) return unauthorized_();
+      if (data.action === 'admin_request_status') {
+        const saved = findRequest_(String(data.id || ''));
+        return json_({ ok: true, status: saved ? saved.status : 'Unknown' });
+      }
+      if (data.action === 'approve_request') {
+        const approvalLock = LockService.getScriptLock();
+        if (!approvalLock.tryLock(10000)) throw new Error('An update is in progress. Check the request status shortly.');
+        try { return approveRequest_(data); } finally { approvalLock.releaseLock(); }
+      }
       if (data.action === 'save_instagram_post') return instagramSave_(data);
       if (data.action === 'delete_instagram_post') return instagramDelete_(data);
       if (['admin_requests', 'admin_events', 'admin_availability', 'menu'].indexOf(data.action) !== -1) {

@@ -248,13 +248,28 @@
     }
     const usedToken = adminToken;
     const isRead = ['admin_requests', 'admin_events', 'admin_availability', 'menu'].includes(payload.action);
-    const response = await fetch(isRead ? '/api/admin-read' : API, {
-      method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ ...payload, adminToken: usedToken })
-    });
     let data;
-    try { data = await response.json(); }
-    catch { throw new Error('Backend returned an invalid response. Please try again shortly.'); }
+    try {
+      const response = await fetch(isRead ? '/api/admin-read' : API, {
+        method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ ...payload, adminToken: usedToken }),
+        ...(payload.action === 'approve_request' ? { signal: AbortSignal.timeout(25000) } : {})
+      });
+      data = await response.json();
+      if (typeof data?.ok !== 'boolean') throw Error();
+    } catch {
+      if (payload.action === 'approve_request') {
+        for (let attempt=0; attempt<2 && usedToken===adminToken; attempt++) {
+          try {
+            const response=await fetch('/api/admin-read',{method:'POST',headers:{'Content-Type':'application/json'},
+              body:JSON.stringify({action:'admin_request_status',id:payload.id,adminToken:usedToken})});
+            const receipt=await response.json();
+            if (receipt.ok && String(receipt.status).toLowerCase()==='approved') { data={ok:true,approved:true}; break; }
+          } catch {}
+        }
+      }
+      if (!data?.ok) throw new Error('Confirmation could not be retrieved. The action may already be saved. Refresh the dashboard to check before trying again.');
+    }
     if (usedToken !== adminToken) throw new Error('Session ended.');
     if (!data.ok) {
       if (data.code === 'UNAUTHORIZED') signOut('Please sign in again.');
@@ -660,6 +675,7 @@
 
           button.onclick =
             async () => {
+              if (button.disabled) return;
 
               const request =
                 requests.find(
@@ -698,6 +714,9 @@
               }
 
 
+              button.disabled = true;
+              const oldLabel = button.textContent;
+              button.textContent = "Approving…";
               try {
 
                 await post({
@@ -723,6 +742,8 @@
                   error.message
                 );
 
+              } finally {
+                button.disabled = false; button.textContent = oldLabel;
               }
 
             };

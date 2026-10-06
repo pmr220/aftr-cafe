@@ -1,6 +1,6 @@
 const { createHmac, timingSafeEqual } = require('node:crypto');
 const API = 'https://script.google.com/macros/s/AKfycbzqEXZAiI0O9ymi6IkMeQucPNwzN4m23CdPYpVX5MUnzl-RpARoDjnlTwnutBfmVROx/exec';
-const READS = new Set(['admin_requests', 'admin_events', 'admin_availability', 'menu']);
+const READS = new Set(['admin_requests', 'admin_events', 'admin_availability', 'menu', 'admin_request_status']);
 
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
@@ -37,7 +37,8 @@ module.exports = async (req, res) => {
     try {
       const response = await fetch(API, {
         method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: body.action, adminToken: body.adminToken }),
+        body: JSON.stringify({ action: body.action, adminToken: body.adminToken,
+          ...(body.action === 'admin_request_status' ? { id: String(body.id || '').slice(0,100) } : {}) }),
         signal: AbortSignal.timeout(25000)
       });
       upstreamStatus = response.status;

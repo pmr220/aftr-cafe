@@ -48,7 +48,21 @@
       ids.set(key,saved);
       try { sessionStorage.setItem(key,JSON.stringify(saved)); } catch {}
       body.requestId=saved.id;
-      return fetch(url,{...options,body:JSON.stringify(body)});
+      try {
+        const response=await fetch(url,{...options,body:JSON.stringify(body),signal:AbortSignal.timeout(20000)});
+        const data=await response.json();
+        if (typeof data?.ok === 'boolean') return {json:async()=>data};
+      } catch {}
+      // Never replay the submission. Read its saved receipt after an uncertain response.
+      for (let attempt=0;attempt<3;attempt++) {
+        try {
+          const response=await fetch('/api/submission-receipt',{method:'POST',headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({requestId:saved.id}),signal:AbortSignal.timeout(22000)});
+          const receipt=await response.json();
+          if (response.ok && receipt.ok && receipt.received===true) return {json:async()=>({ok:true,requestId:saved.id})};
+        } catch {}
+      }
+      throw new Error('Confirmation is delayed. Your request may already be saved. Please contact AFTR before submitting again. Reference: '+saved.id);
     }
   };
 })();
