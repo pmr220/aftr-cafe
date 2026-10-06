@@ -53,7 +53,7 @@ const CONFIG = {
     'd583b56ac0cd543583f9af6cdee3edd8231ea8bf589b370a9e9b80364205c7fd@group.calendar.google.com',
 
   TEAM_EMAIL:
-    'parthrathi7@gmail.com',
+    'aftrcafe@gmail.com',
 
   BUSINESS_NAME:
     'AFTR — All Day Cafe',
@@ -1320,13 +1320,7 @@ function readAction_(
           )
           .sort(
             (a, b) =>
-              String(
-                b.createdAt
-              ).localeCompare(
-                String(
-                  a.createdAt
-                )
-              )
+              (new Date(b.createdAt).getTime() || 0) - (new Date(a.createdAt).getTime() || 0)
           );
 
 
@@ -1686,6 +1680,8 @@ function publicEvent_(
 ) {
 
   return {
+    createdAt: createdAtIso_(event.createdAt),
+
 
     id:
       event.eventId,
@@ -1753,6 +1749,8 @@ function calendarBlock_(
 ) {
 
   return {
+    createdAt: createdAtIso_(item.createdAt),
+
 
     id:
       clean_(
@@ -1808,6 +1806,8 @@ function menu_(
 ) {
 
   return {
+    createdAt: createdAtIso_(item.uploadedAt),
+
 
     id:
       clean_(
@@ -4838,4 +4838,9 @@ function submitOnce_(data) {
     if (data.action === 'collaboration') return submitCollaboration_(data);
     return submitEvent_(data);
   } finally { lock.releaseLock(); }
+}
+
+function createdAtIso_(value) {
+  const date = new Date(value || "");
+  return isNaN(date.getTime()) ? "" : date.toISOString();
 }

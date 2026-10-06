@@ -1,5 +1,5 @@
 const { createHmac, timingSafeEqual } = require('node:crypto');
-const API = 'https://script.google.com/macros/s/AKfycbzqEXZAiI0O9ymi6IkMeQucPNwzN4m23CdPYpVX5MUnzl-RpARoDjnlTwnutBfmVROx/exec';
+const API = 'https://script.google.com/macros/s/AKfycbxHzrM50fNB43-rNfz-jT8g8Po3a4Vgw0TBulplRuX_cZr14FweZd2jEQ0UGUWOGF4X/exec';
 const READS = new Set(['admin_requests', 'admin_events', 'admin_availability', 'menu', 'admin_request_status']);
 
 module.exports = async (req, res) => {

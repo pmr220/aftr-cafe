@@ -1,4 +1,4 @@
-const API = 'https://script.google.com/macros/s/AKfycbzqEXZAiI0O9ymi6IkMeQucPNwzN4m23CdPYpVX5MUnzl-RpARoDjnlTwnutBfmVROx/exec';
+const API = 'https://script.google.com/macros/s/AKfycbxHzrM50fNB43-rNfz-jT8g8Po3a4Vgw0TBulplRuX_cZr14FweZd2jEQ0UGUWOGF4X/exec';
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   if (req.method !== 'GET') return res.status(405).json({ ok: false });

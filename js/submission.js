@@ -28,7 +28,7 @@
       state(form).sent = true;
       const panel = document.createElement('div');
       panel.className = 'request-confirmation'; panel.setAttribute('role', 'status'); panel.tabIndex = -1;
-      panel.innerHTML = '<h3>Request sent</h3><p>Thank you. The AFTR team will review your request and contact you to confirm the details.</p><p>Please do not submit it again.</p>';
+      panel.innerHTML = '<h3>Request sent</h3><p>Thank you. The AFTR team will review your request and contact you to confirm the details.</p>';
       form.after(panel); form.hidden = true; panel.focus();
     },
     error(form) {

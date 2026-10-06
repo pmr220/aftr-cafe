@@ -28,6 +28,8 @@
   let events = [];
   let calendarEntries = [];
   let menus = [];
+  const newestFirst = rows => [...(rows || [])].sort((a,b) =>
+    (Date.parse(b.createdAt || b.uploadedAt || '') || 0) - (Date.parse(a.createdAt || a.uploadedAt || '') || 0));
   const instagramAdmin = window.aftrInstagramAdmin?.(post);
 
   let requestFilter =
@@ -291,10 +293,10 @@
     const session = adminToken;
     status.textContent = 'Loading dashboard…';
     const sections = [
-      ['Requests', 'admin_requests', data => { requests = data.requests || []; }],
-      ['Events', 'admin_events', data => { events = data.events || []; }],
-      ['Calendar', 'availability', data => { calendarEntries = data.blocks || []; }],
-      ['Menus', 'menu', data => { menus = data.menus || []; }]
+      ['Requests', 'admin_requests', data => { requests = newestFirst(data.requests); }],
+      ['Events', 'admin_events', data => { events = newestFirst(data.events); }],
+      ['Calendar', 'availability', data => { calendarEntries = newestFirst(data.blocks); }],
+      ['Menus', 'menu', data => { menus = newestFirst(data.menus); }]
     ];
     const results = await Promise.allSettled(sections.map(async ([name, action, apply]) => {
       const data = await get(action);
@@ -1712,10 +1714,6 @@
 
     list.innerHTML =
       calendarEntries
-        .slice()
-        .sort((a, b) =>
-          `${b.date || ''} ${b.start || ''}`.localeCompare(`${a.date || ''} ${a.start || ''}`)
-        )
         .map(
           block => `
 
@@ -2021,9 +2019,7 @@
         );
 
 
-      menus =
-        data.menus ||
-        [];
+      menus = newestFirst(data.menus);
 
 
       renderMenus();
