@@ -3,4 +3,6 @@ tests/
 scripts/
 AFTR-backend-current.txt
 README.txt
+HOSTINGER-SETUP.md
+server.js
 .pnpm-store/

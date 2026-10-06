@@ -1,7 +1,7 @@
 const { OAuth2Client } = require('google-auth-library');
 const { createHmac } = require('node:crypto');
 const client = new OAuth2Client();
-const ORIGIN = 'https://aftr-cafe-parth.vercel.app';
+const allowedOrigin = require('../lib/allowed-origin');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
@@ -10,7 +10,7 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed.' });
   }
   // This endpoint uses the GIS JavaScript callback, not Google's redirect POST.
-  if (req.headers.origin !== ORIGIN || !/^application\/json(?:;|$)/i.test(req.headers['content-type'] || '')) {
+  if (!allowedOrigin(req.headers.origin) || !/^application\/json(?:;|$)/i.test(req.headers['content-type'] || '')) {
     return res.status(403).json({ error: 'Request not allowed.' });
   }
   const audience = process.env.AFTR_GOOGLE_CLIENT_ID;

@@ -1,11 +1,12 @@
 const { createHmac, timingSafeEqual } = require('node:crypto');
+const allowedOrigin = require('../lib/allowed-origin');
 const API = 'https://script.google.com/macros/s/AKfycbxHzrM50fNB43-rNfz-jT8g8Po3a4Vgw0TBulplRuX_cZr14FweZd2jEQ0UGUWOGF4X/exec';
 const READS = new Set(['admin_requests', 'admin_events', 'admin_availability', 'menu', 'admin_request_status']);
 
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   if (req.method !== 'POST') return res.status(405).json({ ok: false });
-  if (req.headers.origin !== 'https://aftr-cafe-parth.vercel.app') return res.status(403).json({ ok: false });
+  if (!allowedOrigin(req.headers.origin)) return res.status(403).json({ ok: false });
   let body;
   try { body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; } catch {}
   if (!body || !READS.has(body.action)) return res.status(400).json({ ok: false });
